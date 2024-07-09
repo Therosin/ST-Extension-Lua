@@ -28,6 +28,8 @@ export class LuaEnv {
             for (const script of this.GlobalScripts) {
                 await this.Lua.loadModule(script.name, script.code);
             }
+            
+            SetupEnv(this.Lua)
         }
     }
 
@@ -47,7 +49,6 @@ export class LuaEnv {
 
     async execute(script, data) {
         if (this.Lua == null) throw new Error('Lua is not initialized');
-        await this.init();
         return this.Lua.execute(script, data);
     }
 
@@ -61,8 +62,7 @@ export class LuaEnv {
     */
     async registerModule(name, modulecode) {
         if (this.Lua == null) throw new Error('Lua is not initialized');
-        await this.init();
-        return this.Lua.loadModule(name, modulecode);
+        return await this.Lua.loadModule(name, modulecode);
     }
 
 
@@ -76,10 +76,19 @@ export class LuaEnv {
     */
     async registerFunction(name, func) {
         if (this.Lua == null) throw new Error('Lua is not initialized');
-        await this.init();
         return this.Lua.setGlobal(name, func);
     }
 }
 
+const SetupEnv = (env) => {
+    // Modify the Lua State Available to ST here
+    env.setGlobal("GetContext", () => { 
+        return SillyTavern.getContext()
+    })
+}
+
+
+
 const Lua = new LuaEnv();
+Lua.init()
 export default Lua;
