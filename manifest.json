@@ -1,0 +1,12 @@
+{
+    "display_name": "Lua Scripts",
+    "loading_order": 5,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "dist/main.css",
+    "author": "therosin",
+    "version": "1.0.0",
+    "homePage": "https://github.com/therosin/ST-Extension-Lua",
+    "auto_update": false
+}
