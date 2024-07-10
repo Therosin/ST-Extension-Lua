@@ -83,7 +83,7 @@ export class LuaEnv {
 const SetupEnv = (env) => { // Modify the Lua State Available to ST here
     
     // get js type information. eg: if (type(ctx) == "userdata") and jstype(ctx) == "object" then ... end
-    env.setGlobal('jstype', (obj) => typeof obj)
+    env.setGlobal('jstype', (obj) => { return typeof obj })
     
     // SillyTavern Interop
     env.setGlobal("SillyTavern",{
