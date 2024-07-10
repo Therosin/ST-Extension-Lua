@@ -25,8 +25,8 @@ async function handleAppEvent(args) {
 }
 
 function App() {
-
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isDevMode, setIsDevMode] = useState(false);
 
     function toggleDrawer() {
         setIsDrawerOpen(!isDrawerOpen);
@@ -56,6 +56,16 @@ function App() {
             });
     }
 
+    function handleDevToggle() {
+        if (isDevMode) {
+            delete window.Lua;
+            console.log('Dev mode disabled');
+        } else {
+            window.Lua = Lua;
+            console.log('Dev mode enabled');
+        }
+        setIsDevMode(!isDevMode);
+    }
 
     function handleListChange(list) {
         console.log('Saving global scripts', list.map(script => script.name));
@@ -80,8 +90,11 @@ function App() {
                                 <i className="fa-solid fa-rotate-right"></i>
                                 <span>Reload Runtime</span>
                             </div>
+                            <div onClick={handleDevToggle} className="menu_button menu_button_icon flexGap5" title="Toggle Dev Mode">
+                                <i className={`fa-solid ${isDevMode ? 'fa-toggle-on' : 'fa-toggle-off'}`}></i>
+                                <span>Dev</span>
+                            </div>
                         </div>
-                        <hr className="sysHR" />
                     </div>
                 )}
             </div>
@@ -89,5 +102,5 @@ function App() {
     );
 }
 
-
 export default App;
+
