@@ -45,3 +45,8 @@ You can run the script using the following command:
 /echo {{pipe}} ||`
 ```
 this will print `Hello, World!` in the console and echo the same message as a toast.
+
+## Example QR Set / Mini Tutorial
+
+Check out the included LuaScripts QR Set for a basic tutorial and some examples.
+[LuaScripts](LuaScripts.json)
