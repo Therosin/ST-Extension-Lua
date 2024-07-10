@@ -80,11 +80,14 @@ export class LuaEnv {
     }
 }
 
-const SetupEnv = (env) => {
-    // Modify the Lua State Available to ST here
-    env.setGlobal("GetContext", () => { 
-        return SillyTavern.getContext()
+const SetupEnv = (env) => { // Modify the Lua State Available to ST here
+    
+    env.setGlobal("SillyTavern",{
+        /** Returns ST Context for use in lua. */
+        GetContext: () => SillyTavern.getContext(),
+
     })
+
 }
 
 
