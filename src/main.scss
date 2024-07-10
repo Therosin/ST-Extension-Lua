@@ -1,22 +1,21 @@
 /* Container for Lua scripts */
 .extension-lua-scripts-container {
   height: 100%;
+  overflow: hidden;
 }
 
 /* Header for Lua scripts */
 .extension-lua-scripts-header {
   border-bottom: 1px solid #e0e0e0;
   padding: 10px 20px;
-  // display: flex;
-  // justify-content: space-between;
-  // align-items: flex-start;
 }
 
 /* List of Lua scripts */
 .extension-lua-scripts-list {
   padding: 20px;
-  max-height: 500px; /* Adjust as needed */
   overflow-y: auto;
+  flex-grow: 1;
+  max-height: 650px;
 }
 
 /* Container for individual Lua script */
@@ -28,7 +27,6 @@
 .extension-lua-scripts-list-script-header {
   padding: 10px 20px;
   border-bottom: 1px solid #e0e0e0;
-  // display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
