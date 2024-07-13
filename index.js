@@ -3,7 +3,7 @@
 /* global SillyTavern */
 /* global jQuery */
 import { SlashCommand } from '../../../slash-commands/SlashCommand.js';
-import { ARGUMENT_TYPE, SlashCommandArgument, SlashCommandNamedArgument } from '../../../slash-commands/SlashCommandArgument.js';
+import { ARGUMENT_TYPE, SlashCommandNamedArgument } from '../../../slash-commands/SlashCommandArgument.js';
 import { SlashCommandParser } from '../../../slash-commands/SlashCommandParser.js';
 import { executeLuaScript, executeLuaCode, Context, setup } from './dist/main.js';
 const MODULE_NAME = 'Extension-Lua';
@@ -12,7 +12,7 @@ export { MODULE_NAME };
 // ========= Register Slash Commands =========
 function registerSlashCommands() {
 
-    /* run script for character */
+    /* run global script */
     async function luaScriptSlashCommand(namedArgs, args) {
 
         let scriptId
@@ -48,17 +48,25 @@ function registerSlashCommands() {
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'lua-script',
         callback: luaScriptSlashCommand,
-        helpString: `Execute a lua script for a character.\n
-        Example:
-        \n/lua script="test" data="Hello, World!" json=true
-        \n/lua scriptId=0 data="Hello, World!" json=true
+        helpString: `
+        <h4>Execute a lua script for a character.</h4>
+        <br> - Must provide either script or scriptId. (not both) used to find the script to run.
+        <br> - You can provide data to pass to the script, this should be string/number/boolean or you can pass a jsonstring.
+        <br> - If json is true, the data will be parsed from json string to a lua table.
+        <br> - If the script returns a value, it will be returned, if it returns a table, it will be stringified to jsonstring.
+        <br> Examples:
+        <ul>
+            <li> <code>/lua script="test" data="Hello, World!" json=true</code> </li>
+            <li> <code>/lua scriptId=0 data="Hello, World!" json=true</code> </li>
+        </ul>
+        <br> returned tables will be stringified, this means you can return a table from lua and pipe it directly into a variable and it just works.
         `,
         aliases: ["luascript"],
         namedArgumentList: [
             SlashCommandNamedArgument.fromProps({
                 name: 'script',
                 description: 'Name of the script to run, if not provided, scriptId must be used.',
-                type: ARGUMENT_TYPE.STRING,
+                typeList: [ARGUMENT_TYPE.STRING],
                 required: false,
             }),
             SlashCommandNamedArgument.fromProps({
@@ -69,17 +77,19 @@ function registerSlashCommands() {
             }),
             SlashCommandNamedArgument.fromProps({
                 name: 'data',
-                description: 'Optional data to pass to the script. must be a string, if json is true, must be a json string to parse.',
-                type: ARGUMENT_TYPE.STRING,
+                description: `Optional data to pass to the script. must be a string, if json is true it must be a json string to parse.
+                `,
+                typeList: [ARGUMENT_TYPE.STRING],
                 required: false,
             }),
             SlashCommandNamedArgument.fromProps({
                 name: 'json',
                 description: 'If true, data will be parsed as json.',
-                type: ARGUMENT_TYPE.BOOLEAN,
+                typeList: [ARGUMENT_TYPE.BOOLEAN],
                 required: false,
             }),
         ],
+        returns: "a single return value from lua, if a vailable."
     }));
 
     /* run raw lua code */
@@ -107,30 +117,42 @@ function registerSlashCommands() {
     SlashCommandParser.addCommandObject(SlashCommand.fromProps({
         name: 'lua-run',
         callback: luaRunSlashCommand,
-        helpString: `Execute raw lua code.
-        Example: /lua code='print("Hello, World!")'
+        helpString: `
+        <h4>Execute raw lua code</h4>
+        <br> - Provide the lua code to run.
+        <br> - You can provide data to pass to the script, this should be string/number/boolean or you can pass a jsonstring.
+        <br> - If json is true, the data will be parsed from json string to a lua table.
+        <br> - If the script returns a value, it will be returned, if it returns a table, it will be stringified to jsonstring.
+        <br> Examples:
+        <ul>
+            <li> Example: <code>/lua code='print("Hello, World!")'</code> </li>
+            <li> Example: <code>/lua code='return "Hello, World!"' | /echo {{pipe}}</code> </li>
+        </ul>
+        <br> returned tables will be stringified, this means you can return a table from lua and pipe it directly into a variable and it just works.
         `,
         aliases: ["lua"],
-        argumentList: [
-            SlashCommandArgument.fromProps({
+        namedArgumentList: [
+            SlashCommandNamedArgument.fromProps({
                 name: 'code',
                 description: 'The lua code to run.',
-                type: ARGUMENT_TYPE.STRING,
+                typeList: [ARGUMENT_TYPE.STRING],
                 required: true,
             }),
-            SlashCommandArgument.fromProps({
+            SlashCommandNamedArgument.fromProps({
                 name: 'data',
-                description: 'Optional data to pass to the script. must be a string, if json is true, must be a json string to parse.',
-                type: ARGUMENT_TYPE.STRING,
+                description: `Optional data to pass to the script. must be a string, if json is true it must be a json string to parse.
+                `,
+                typeList: [ARGUMENT_TYPE.STRING],
                 required: false,
             }),
-            SlashCommandArgument.fromProps({
+            SlashCommandNamedArgument.fromProps({
                 name: 'json',
                 description: 'If true, data will be parsed as json.',
-                type: ARGUMENT_TYPE.BOOLEAN,
+                typeList: [ARGUMENT_TYPE.BOOLEAN],
                 required: false,
             }),
         ],
+        returns: "a single return value from lua, if available."
     }));
 
     console.log("Extension-Lua: Registered slash commands");
