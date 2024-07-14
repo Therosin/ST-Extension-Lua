@@ -2,7 +2,7 @@
 // eslint-disable-next-line no-unused-vars
 /* global SillyTavern */
 import ReactDOM from 'react-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import _ from 'lodash';
 import Context from './Context';
 import Lua from './lib/LuaEnv';
@@ -27,6 +27,19 @@ async function handleAppEvent(args) {
 function App() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isDevMode, setIsDevMode] = useState(false);
+    const [settings, setSettings] = useState({
+        enableTimers: false,
+        enableLocalStorage: false
+    });
+
+    useEffect(() => {
+        // Retrieve initial settings from Context
+        const initialSettings = {
+            enableTimers: Context.getSetting('enableTimers'),
+            enableLocalStorage: Context.getSetting('enableLocalStorage')
+        };
+        setSettings(initialSettings);
+    }, []);
 
     function toggleDrawer() {
         setIsDrawerOpen(!isDrawerOpen);
@@ -72,8 +85,13 @@ function App() {
         Context.setGlobalScripts(list);
     }
 
+    function handleSettingChange(setting, value) {
+        setSettings(prevSettings => ({ ...prevSettings, [setting]: value }));
+        Context.setSetting(setting, value);
+    }
+
     return (
-        <div className="scripts-settings">
+        <div className="extension-lua-scripts-settings">
             <div className="inline-drawer">
                 <div className="inline-drawer-toggle inline-drawer-header" onClick={toggleDrawer}>
                     <b>Lua Scripts</b>
@@ -81,7 +99,7 @@ function App() {
                 </div>
                 {isDrawerOpen && (
                     <div className="inline-drawer-content">
-                        <div className="flex-container">
+                        <div className="flex-container extension-lua-scripts-menu">
                             <div onClick={handleClick} className="menu_button menu_button_icon flexGap5" title="Lua Scripts">
                                 <i className="fa-solid fa-code"></i>
                                 <span>Scripts</span>
@@ -95,6 +113,29 @@ function App() {
                                 <span>Dev</span>
                             </div>
                         </div>
+                        <div className="flex-container extension-lua-scripts-settings-container">
+                            <div className="extension-lua-scripts-settings-header">
+                                <b>Settings</b><br />
+                                <span style={{ fontSize: '0.8em' }}>affects all scripts, reload runtime to apply changes.</span>
+                            </div>
+                            <div className="extension-lua-scripts-settings-row">
+                                <div className="extension-lua-scripts-setting">
+                                    <label htmlFor="enableTimers">
+                                        <input type="checkbox" id="enableTimers" checked={settings.enableTimers} onChange={(e) => handleSettingChange('enableTimers', e.target.checked)} />
+                                        Timers
+                                    </label>
+                                    <span className="extension-lua-scripts-settings-description">Allow the use of Interval and Timeout functions, use with caution. this can cause performance issues.</span>
+                                </div>
+
+                                <div className="extension-lua-scripts-setting">
+                                    <label htmlFor="enableLocalStorage">
+                                        <input type="checkbox" id="enableLocalStorage" checked={settings.enableLocalStorage} onChange={(e) => handleSettingChange('enableLocalStorage', e.target.checked)} />
+                                        Local Storage
+                                    </label>
+                                    <span className="extension-lua-scripts-settings-description">Allow scripts to persist data between sessions using local storage.</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
@@ -103,4 +144,3 @@ function App() {
 }
 
 export default App;
-

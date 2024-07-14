@@ -1,0 +1,212 @@
+-- Copyright (C) 2024 Theros <https://github.com/therosin>
+-- 
+-- This file is part of ST-Extension-Lua.
+-- 
+-- ST-Extension-Lua is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+-- 
+-- ST-Extension-Lua is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+-- 
+-- You should have received a copy of the GNU General Public License
+-- along with ST-Extension-Lua.  If not, see <https://www.gnu.org/licenses/>.
+---@meta
+
+
+---@class ChatMessage
+---@field public name string
+---@field public is_user boolean
+---@field public is_system boolean
+---@field public send_date string
+---@field public mes string
+---@field public extra table
+
+---@class CharacterData
+---@field public name string
+---@field public description string
+---@field public personality string
+---@field public first_mes string
+---@field public avatar string
+---@field public chat string
+---@field public mes_example string
+---@field public scenario string
+---@field public create_date string
+---@field public talkativeness string
+---@field public fav boolean
+---@field public creatorcomment string
+---@field public spec string
+---@field public spec_version string
+---@field public data CharacterInnerData
+---@field public tags any[]
+---@field public json_data string
+---@field public date_added number
+---@field public chat_size number
+---@field public date_last_chat number
+---@field public data_size number
+
+---@class CharacterInnerData
+---@field public name string
+---@field public description string
+---@field public personality string
+---@field public scenario string
+---@field public first_mes string
+---@field public mes_example string
+---@field public creator_notes string
+---@field public system_prompt string
+---@field public post_history_instructions string
+---@field public tags any[]
+---@field public creator string
+---@field public character_version string
+---@field public alternate_greetings any[]
+---@field public extensions CharacterExtensions
+---@field public character_book CharacterBook
+
+---@class CharacterExtensions
+---@field public talkativeness string
+---@field public fav boolean
+---@field public world string
+
+---@class CharacterBook
+---@field public entries CharacterBookEntry[]
+---@field public name string
+
+---@class CharacterBookEntry
+---@field public id number
+---@field public keys string[]
+---@field public secondary_keys any[]
+---@field public comment string
+---@field public content string
+---@field public constant boolean
+---@field public selective boolean
+---@field public insertion_order number
+---@field public enabled boolean
+---@field public position string
+---@field public extensions CharacterBookEntryExtensions
+
+---@class CharacterBookEntryExtensions
+---@field public position number
+---@field public probability any
+---@field public useProbability boolean
+
+---@class ChatMetadata
+---@field public chat_id_hash number
+---@field public note_prompt string
+---@field public note_interval number
+---@field public note_position number
+---@field public note_depth number
+---@field public note_role number
+---@field public tainted boolean
+---@field public timedWorldInfo TimedWorldInfo
+
+---@class TimedWorldInfo
+---@field public sticky table
+---@field public cooldown table
+
+---@class EventSource
+---@field public events table<string, function[]>
+
+---@class EventTypes
+---@field public APP_READY string
+---@field public EXTRAS_CONNECTED string
+-- add other event types here...
+
+---@class ExtensionPrompts
+---@field public value string
+---@field public position number
+---@field public depth number
+---@field public scan boolean
+---@field public role number
+
+---@class ExtensionSettings
+---@field public apiUrl string
+---@field public apiKey string
+---@field public autoConnect boolean
+---@field public notifyUpdates boolean
+---@field public disabledExtensions any[]
+---@field public expressionOverrides any[]
+-- add other settings fields here...
+
+---@class Context
+---@field public chat ChatMessage[]
+---@field public characters CharacterData[]
+---@field public groups any[]
+---@field public name1 string
+---@field public name2 string
+---@field public characterId string
+---@field public groupId any
+---@field public chatId string
+---@field public getCurrentChatId function
+---@field public getRequestHeaders function
+---@field public reloadCurrentChat function
+---@field public renameChat function
+---@field public saveSettingsDebounced function
+---@field public onlineStatus string
+---@field public maxContext number
+---@field public chatMetadata ChatMetadata
+---@field public streamingProcessor any
+---@field public eventSource EventSource
+---@field public eventTypes EventTypes
+---@field public addOneMessage function
+---@field public generate function
+---@field public stopGeneration function
+---@field public getTokenCount function
+---@field public extensionPrompts ExtensionPrompts
+---@field public setExtensionPrompt function
+---@field public updateChatMetadata function
+---@field public saveChat function
+---@field public openCharacterChat function
+---@field public openGroupChat function
+---@field public saveMetadata function
+---@field public sendSystemMessage function
+---@field public activateSendButtons function
+---@field public deactivateSendButtons function
+---@field public saveReply function
+---@field public substituteParams function
+---@field public substituteParamsExtended function
+---@field public SlashCommandParser function
+---@field public executeSlashCommandsWithOptions function
+---@field public registerSlashCommand function
+---@field public executeSlashCommands function
+---@field public timestampToMoment function
+---@field public registerHelper function
+---@field public registerMacro function
+---@field public unregisterMacro function
+---@field public registedDebugFunction function
+---@field public renderExtensionTemplate function
+---@field public renderExtensionTemplateAsync function
+---@field public registerDataBankScraper function
+---@field public callPopup function
+---@field public callGenericPopup function
+---@field public showLoader function
+---@field public hideLoader function
+---@field public mainApi string
+---@field public extensionSettings ExtensionSettings
+---@field public ModuleWorkerWrapper function
+---@field public getTokenizerModel function
+---@field public generateQuietPrompt function
+---@field public writeExtensionField function
+---@field public getThumbnailUrl function
+---@field public selectCharacterById function
+---@field public messageFormatting function
+---@field public shouldSendOnEnter function
+---@field public isMobile function
+---@field public t function
+---@field public translate function
+---@field public tags table[]
+---@field public tagMap table<string, string[]>
+---@field public menuType string
+---@field public createCharacterData table
+---@field public event_types any
+---@field public Popup function
+---@field public POPUP_TYPE table<string, number>
+---@field public POPUP_RESULT table<string, number | nil>
+
+
+---@class SillyTavern
+---@field public getContext fun(): Context
+local SillyTavern = {}
+_G.SillyTavern = SillyTavern

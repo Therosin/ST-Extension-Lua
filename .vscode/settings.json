@@ -1,0 +1,17 @@
+{
+    "Lua.workspace.library": [
+        ".vscode/lua.types.d"
+    ],
+    "Lua.workspace.ignoreDir": [
+        ".vscode",
+        "dist",
+    ],
+    "Lua.diagnostics.globals": [
+        "js_localStorage",
+        "setTimeout",
+        "clearTimeout",
+        "setInterval",
+        "clearInterval",
+        "json",
+    ],
+}

@@ -2,7 +2,7 @@
 // eslint-disable-next-line no-unused-vars
 /* global SillyTavern */
 import { EXTENSION_NAME, DEFAULT_SETTINGS } from './constants.js';
-const { context, extensionSettings, saveSettingsDebounced } = SillyTavern.getContext();
+const { extensionSettings, saveSettingsDebounced } = SillyTavern.getContext();
 
 
 // Loads the extension settings if they exist, otherwise initializes them to the defaults.
@@ -20,40 +20,23 @@ class Context {
         loadSettings();
     }
 
-    GetSetting(key) {
+    getSetting(key) {
         const settings = extensionSettings[EXTENSION_NAME];
         return settings[key];
     }
 
-    SetSetting(key, value) {
+    setSetting(key, value) {
         const settings = extensionSettings[EXTENSION_NAME];
         settings[key] = value;
         saveSettingsDebounced();
     }
 
-    getCharacterId() {
-        let characterId = context.characterId;
-        // When peeking a group chat member, find a proper characterId
-        if (context.groupId) {
-            const avatarUrlInput = document.getElementById('avatar_url_pole');
-            if (avatarUrlInput instanceof HTMLInputElement) {
-                const avatarUrl = avatarUrlInput.value;
-                characterId = context.characters.findIndex(c => c.avatar === avatarUrl);
-            }
-        }
-        return characterId;
-    }
-
-    getCharacterIdFromAvatarUrl(avatarUrl) {
-        return context.characters.findIndex(c => c.avatar === avatarUrl);
-    }
-
     getGlobalScripts() {
-        return this.GetSetting('globalScripts');
+        return this.getSetting('globalScripts');
     }
 
     setGlobalScripts(scripts) {
-        this.SetSetting('globalScripts', scripts);
+        this.setSetting('globalScripts', scripts);
     }
 
     /**
