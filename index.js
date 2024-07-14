@@ -49,8 +49,9 @@ function registerSlashCommands() {
         name: 'lua-script',
         callback: luaScriptSlashCommand,
         helpString: `
-        <h4>Execute a lua script for a character.</h4>
+        <h4>Execute a lua globalscript.</h4>
         <br> - Must provide either script or scriptId. (not both) used to find the script to run.
+        <br> - script is the name of the script as defined in the globalscripts menu. scriptId is the index of the script.
         <br> - You can provide data to pass to the script, this should be string/number/boolean or you can pass a jsonstring.
         <br> - If json is true, the data will be parsed from json string to a lua table.
         <br> - If the script returns a value, it will be returned, if it returns a table, it will be stringified to jsonstring.
