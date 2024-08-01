@@ -1,6 +1,7 @@
 // @ts-nocheck
 // eslint-disable-next-line no-unused-vars
 /* global SillyTavern */
+/* global toastr */
 import { createLuaBridge } from './LuaBridge';
 import Context from '../Context';
 
@@ -200,7 +201,7 @@ const SetupEnv = (self, env) => { // Modify the Lua State Available to ST here
     env.setGlobal("SillyTavern", {
         /** Returns ST Context for use in lua. */
         GetContext: () => SillyTavern.getContext(),
-    })
+    });
 
     // get js type information. eg: if (type(ctx) == "userdata") and jstype(ctx) == "object" then ... end
     env.setGlobal('jstype', (obj) => { return typeof obj })
@@ -286,6 +287,14 @@ const SetupEnv = (self, env) => { // Modify the Lua State Available to ST here
             }
         });
     }
+
+    // allow access to toastr to display notifications
+    env.setGlobal('toastr', {
+        success: (...args) => toastr.success(...args),
+        info: (...args) => toastr.info(...args),
+        warning: (...args) => toastr.warning(...args),
+        error: (...args) => toastr.error(...args)
+    });
 
 
     // load bundled lua files
