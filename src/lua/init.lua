@@ -1,3 +1,4 @@
+---@diagnostic disable: deprecated
 -- Copyright (C) 2024 Theros <https://github.com/therosin>
 --
 -- This file is part of ST-Extension-Lua.
@@ -16,19 +17,29 @@
 -- along with ST-Extension-Lua.  If not, see <https://www.gnu.org/licenses/>.
 local EventManager = require "EventManager" ---@type EventManager
 
-local Extension = {
-    name = "ST-Extension-Lua",
-    version = "0.2.0",
-    author = "Theros <github/therosin>"
-}
-
+-- Disable Debugging by default.
 _G.DEBUG = false
 
+-- Global Extension Object.
+local Extension = {
+    name = "ST-Extension-Lua",
+    version = "1.2.0",
+    author = "Theros <github/therosin>",
+    config = {
+        event_timer = 1000
+    }
+}
+_G.Extension = Extension
 
-_G.Log = function(...)
-    print("[" .. Extension.name .. "]", ...)
+-- Binds unpack to table.unpack for compatibility.
+_G.unpack = unpack or table.unpack;
+
+-- General Logging.
+_G.Log = function(message, ...)
+    print(string.format("[%s] " .. message, Extension.name, ...))
 end
 
+-- Setup LocalStorage.
 if not (js_localStorage == nil) then
     local localStorage = require "localStorage"
 
@@ -37,26 +48,37 @@ if not (js_localStorage == nil) then
     if config.version == nil then
         Log("Initializing config")
         config.version = Extension.version
+        for key, value in pairs(Extension.config) do
+            config[key] = value
+        end
+        localStorage.set("config", config)
     end
 
     if config.version ~= Extension.version then
         Log("Updating config from version " .. config.version .. " to " .. Extension.version)
         config.version = Extension.version
         --- settings update logic here later...
+        localStorage.set("config", config)
     end
 
-    localStorage.set("config", config)
+    -- Load config from localStorage
+    config = localStorage.get("config") or {}
+    for key, _ in pairs(Extension.config) do
+        if config[key] ~= nil then
+            Extension.config[key] = config[key]
+        end
+    end
 end
 
+-- Setup EventManager.
 _G.Events = EventManager("ST-Lua-EventManager")
-
-
 Events:on("tick", function()
     if DEBUG then
-        Log("Tick")
+        Log("Debug :: EventLoop.Tick")
     end
 end)
 
+-- Setup Main Event Loop.
 local main_timer;
 if (type(_G['setInterval']) == 'function' or jstype(_G['setInterval']) == 'function') then
     main_timer = setInterval(function()
@@ -65,5 +87,5 @@ if (type(_G['setInterval']) == 'function' or jstype(_G['setInterval']) == 'funct
             Log("Error in event loop: " .. err)
         end)
         Events:emit("tick")
-    end, 1000)
+    end, Extension.config.event_timer)
 end
