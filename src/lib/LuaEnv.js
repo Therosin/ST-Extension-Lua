@@ -3,6 +3,7 @@
 /* global SillyTavern */
 /* global toastr */
 import { createLuaBridge } from './LuaBridge';
+import DomManipulator from '../utils/DomManipulator';
 import Context from '../Context';
 
 
@@ -296,23 +297,23 @@ const SetupEnv = (self, env) => { // Modify the Lua State Available to ST here
         error: (...args) => toastr.error(...args)
     });
 
+    // bind Dom Manipulation functions to lua
+    env.setGlobal('Document', DomManipulator);
+
 
     // load bundled lua files
     self.loadFiles([
         // Core Libraries
-        ["common/string.lua", { module: true, namespace: "Common.string" }],
-        ["common/table.lua", { module: true, namespace: "Common.table" }],
-        ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }],
-        ["common/init.lua", { module: true, namespace: "Common" }],
-        ["common/eventmanager.lua", { module: true, namespace: "EventManager" }],
-        // Modules
-        // ["events.lua", { module: true, namespace: "Events" }], // Events, not yet implemented
+        ["common/string.lua", { module: true, namespace: "Common.string" }], // String Utilities
+        ["common/table.lua", { module: true, namespace: "Common.table" }], // Table Utilities
+        ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }], // Local Storage
+        ["common/eventmanager.lua", { module: true, namespace: "EventManager" }], // Event Manager
+        ["common/init.lua", { module: true, namespace: "Common" }], // Common Library
+        // Third Party Libraries.
+        ["libs/inspect.lua", { module: true, namespace: "Inspect" }], // Inspect, Human Readable Table Printing
+        ["libs/pandora.lua", { module: true, namespace: "Pandora" }], // Pandora Class Library
         // Main init file.
         "init.lua",
-        // Third Party Libraries.
-        ["libs/inspect.lua", { module: true, namespace: "Inspect" }],
-        ["libs/pandora.lua", { module: true, namespace: "Pandora" }],
-
     ]).catch(console.error);
 
 
