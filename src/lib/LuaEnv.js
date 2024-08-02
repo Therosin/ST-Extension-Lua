@@ -304,6 +304,7 @@ const SetupEnv = (self, env) => { // Modify the Lua State Available to ST here
         ["common/table.lua", { module: true, namespace: "Common.table" }],
         ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }],
         ["common/init.lua", { module: true, namespace: "Common" }],
+        ["common/eventmanager.lua", { module: true, namespace: "EventManager" }],
         // Modules
         // ["events.lua", { module: true, namespace: "Events" }], // Events, not yet implemented
         // Main init file.
@@ -313,6 +314,16 @@ const SetupEnv = (self, env) => { // Modify the Lua State Available to ST here
         ["libs/pandora.lua", { module: true, namespace: "Pandora" }],
 
     ]).catch(console.error);
+
+
+    // register events
+    const { eventSource, eventTypes } = SillyTavern.getContext()
+    // eslint-disable-next-line no-unused-vars
+    for (const [_, value] of Object.entries(eventTypes)) {
+        eventSource.on(value, (...args) => {
+            env.execute(`if Events then Events:emit("${value}", ...) end`, [...args]);
+        });
+    }
 }
 
 const Lua = new LuaEnv();

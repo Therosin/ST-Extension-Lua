@@ -14,10 +14,16 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with ST-Extension-Lua.  If not, see <https://www.gnu.org/licenses/>.
+local EventManager = require "EventManager" ---@type EventManager
+
 local Extension = {
     name = "ST-Extension-Lua",
     version = "0.2.0",
+    author = "Theros <github/therosin>"
 }
+
+_G.DEBUG = false
+
 
 _G.Log = function(...)
     print("[" .. Extension.name .. "]", ...)
@@ -42,3 +48,22 @@ if not (js_localStorage == nil) then
     localStorage.set("config", config)
 end
 
+_G.Events = EventManager("ST-Lua-EventManager")
+
+
+Events:on("tick", function()
+    if DEBUG then
+        Log("Tick")
+    end
+end)
+
+local main_timer;
+if (type(_G['setInterval']) == 'function' or jstype(_G['setInterval']) == 'function') then
+    main_timer = setInterval(function()
+        Events:set_error(function(err)
+            clearInterval(main_timer)
+            Log("Error in event loop: " .. err)
+        end)
+        Events:emit("tick")
+    end, 1000)
+end

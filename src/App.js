@@ -9,21 +9,6 @@ import Lua from './lib/LuaEnv';
 import EditScriptsPopup from './components/EditScriptsPopup';
 import './main.scss';
 
-const {
-    eventSource,
-    eventTypes,
-} = SillyTavern.getContext();
-
-eventSource.on(eventTypes.CHAT_CHANGED, handleAppEvent);
-
-async function handleAppEvent(args) {
-    //const context = SillyTavern.getContext();
-    const scripts = args.character?.data?.extensions?.scripts;
-    if (Array.isArray(scripts) && scripts.length > 0) {
-        // Handle script execution logic here if needed
-    }
-}
-
 function App() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isDevMode, setIsDevMode] = useState(false);
