@@ -14,14 +14,18 @@ function App() {
     const [isDevMode, setIsDevMode] = useState(false);
     const [settings, setSettings] = useState({
         enableTimers: false,
-        enableLocalStorage: false
+        enableLocalStorage: false,
+        enableFetch: false,
+        enableDomManipulation: false
     });
 
     useEffect(() => {
         // Retrieve initial settings from Context
         const initialSettings = {
             enableTimers: Context.getSetting('enableTimers'),
-            enableLocalStorage: Context.getSetting('enableLocalStorage')
+            enableLocalStorage: Context.getSetting('enableLocalStorage'),
+            enableFetch: Context.getSetting('enableFetch'),
+            enableDomManipulation: Context.getSetting('enableDomManipulation')
         };
         setSettings(initialSettings);
     }, []);
@@ -118,6 +122,22 @@ function App() {
                                         Local Storage
                                     </label>
                                     <span className="extension-lua-scripts-settings-description">Allow scripts to persist data between sessions using local storage.</span>
+                                </div>
+
+                                <div className="extension-lua-scripts-setting">
+                                    <label htmlFor="enableFetch">
+                                        <input type="checkbox" id="enableFetch" checked={settings.enableFetch} onChange={(e) => handleSettingChange('enableFetch', e.target.checked)} />
+                                        Fetch
+                                    </label>
+                                    <span className="extension-lua-scripts-settings-description">Allow scripts to make HTTP requests using the Fetch API, use with caution. this can cause security issues.</span>
+                                </div>
+
+                                <div className="extension-lua-scripts-setting">
+                                    <label htmlFor="enableDomManipulation">
+                                        <input type="checkbox" id="enableDomManipulation" checked={settings.enableDomManipulation} onChange={(e) => handleSettingChange('enableDomManipulation', e.target.checked)} />
+                                        DOM Manipulation
+                                    </label>
+                                    <span className="extension-lua-scripts-settings-description">Allow scripts to manipulate the DOM, use with caution. this can cause security issues.</span>
                                 </div>
                             </div>
                         </div>

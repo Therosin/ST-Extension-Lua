@@ -8,5 +8,9 @@ export const DEFAULT_SETTINGS = {
     /** Allow the use of Interval and Timeout functions */
     enableTimers: false,
     /** Allow the use of LocalStorage */
-    enableLocalStorage: false
+    enableLocalStorage: false,
+    /** Allow the use of Fetch */
+    enableFetch: false,
+    /** Allow the use of DOM manipulation */
+    enableDomManipulation: false,
 };

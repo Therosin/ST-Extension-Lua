@@ -298,7 +298,32 @@ const SetupEnv = (self, env) => { // Modify the Lua State Available to ST here
     });
 
     // bind Dom Manipulation functions to lua
-    env.setGlobal('Document', DomManipulator);
+    if (Context.getSetting('enableDomManipulation')) {
+        env.setGlobal('Document', DomManipulator);
+    }
+
+    // bind fetch function to lua
+    if (Context.getSetting('enableFetch')) {
+        env.setGlobal('fetch', async (url, options) => {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch url ${url}`);
+                }
+                const response_type = response.headers.get('content-type');
+                if (response_type.includes('application/json')) {
+                    return response.json();
+                } else if (response_type.includes('text/html')) {
+                    return response.text();
+                } else {
+                    throw new Error(`Unsupported response type: ${response_type}`);
+                }
+            } catch (error) {
+                console.error(`Error fetching url ${url}: ${error}`);
+                return null;
+            }
+        });
+    }
 
 
     // load bundled lua files
