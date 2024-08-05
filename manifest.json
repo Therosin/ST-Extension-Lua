@@ -6,7 +6,7 @@
     "js": "index.js",
     "css": "dist/main.css",
     "author": "therosin",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "homePage": "https://github.com/therosin/ST-Extension-Lua",
     "auto_update": false
 }

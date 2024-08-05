@@ -23,7 +23,7 @@ _G.DEBUG = false
 -- Global Extension Object.
 local Extension = {
     name = "ST-Extension-Lua",
-    version = "1.2.0",
+    version = "1.2.1",
     author = "Theros <github/therosin>",
     config = {
         event_timer = 1000
