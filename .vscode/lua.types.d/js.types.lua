@@ -90,23 +90,27 @@ local toastr = {}
 
 --- success
 ---@param message string
----@param title string
-function toastr.success(message, title) end
+---@param title? string
+---@param options? table
+function toastr.success(message, title, options) end
 
 --- error
 ---@param message string
----@param title string
-function toastr.error(message, title) end
+---@param title? string
+---@param options? table
+function toastr.error(message, title, options) end
 
 --- warning
 ---@param message string
----@param title string
-function toastr.warning(message, title) end
+---@param title? string
+---@param options? table
+function toastr.warning(message, title, options) end
 
 --- info
 ---@param message string
----@param title string
-function toastr.info(message, title) end
+---@param title? string
+---@param options? table
+function toastr.info(message, title, options) end
 
 _G.toastr = toastr
 
@@ -117,41 +121,3 @@ _G.toastr = toastr
 ---@return any
 _G.fetch = function(url, options) end
 
-
-local Document = {}
-
---- findElement
---- Find an element by selector.
----@param selector string
----@return userdata
-function Document.findElement(selector) end
-
---- createElement
---- Create an element.
----@param tag string
----@param attributes table
----@param textContent? string
----@return userdata
-function Document.createElement(tag, attributes, textContent) end
-
---- modifyElement
---- Modify an element.
----@param element userdata
----@param attributes table
----@param textContent? string
-function Document.modifyElement(element, attributes, textContent) end
-
---- addEventListener
---- Add an event listener to an element.
----@param element userdata
----@param event string
----@param callback function
-function Document.addEventListener(element, event, callback) end
-
---- createStyle
---- Create a css string from a table of css properties.
----@param css table
----@return string
-function Document.createStyle(css) end
-
-_G.Document = Document
