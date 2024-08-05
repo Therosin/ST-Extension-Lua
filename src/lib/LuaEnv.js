@@ -1,10 +1,9 @@
 // @ts-nocheck
 // eslint-disable-next-line no-unused-vars
 /* global SillyTavern */
-/* global toastr */
 import { createLuaBridge } from './LuaBridge';
-import DomManipulator from '../utils/DomManipulator';
 import Context from '../Context';
+import SetupBindings from './LuaBindings';
 
 
 /**
@@ -95,11 +94,7 @@ export class LuaEnv {
         if (this.Lua == null) {
             this.Lua = await createLuaBridge();
             this.GlobalScripts = Context.getGlobalScripts();
-            for (const script of this.GlobalScripts) {
-                await this.Lua.loadModule(script.name, script.code);
-            }
-
-            SetupEnv(this, this.Lua);
+            await SetupEnv(this, this.Lua);
         }
     }
 
@@ -120,6 +115,13 @@ export class LuaEnv {
     async execute(script, data) {
         if (this.Lua == null) throw new Error('Lua is not initialized');
         return this.Lua.execute(script, data);
+    }
+
+    async loadGlobalScripts() {
+        if (this.Lua == null) throw new Error('Lua is not initialized');
+        for (const script of this.GlobalScripts) {
+            await this.Lua.loadModule(script.name, script.code);
+        }
     }
 
     /**
@@ -197,139 +199,27 @@ export class LuaEnv {
     }
 }
 
-const SetupEnv = (self, env) => { // Modify the Lua State Available to ST here    
-    // SillyTavern Interop
+/**
+ * This gets called once on every page load, it sets up the environment available to Lua scripts.
+ * @param {Object} self - The reference to the current object.
+ * @param {Object} env - The Lua environment object.
+ * @returns {Promise<void>} - A promise that resolves when the environment setup is complete.
+*/
+const SetupEnv = async (self, env) => { // Modify the Lua State Available to ST here    
+    // SillyTavern Interop, contains anything exposed by SillyTavern this makes it available to Lua.
     env.setGlobal("SillyTavern", SillyTavern);
 
-    // get js type information. eg: if (type(ctx) == "userdata") and jstype(ctx) == "object" then ... end
-    env.setGlobal('jstype', (obj) => { return typeof obj })
-
-    // bind JS regular expression functions to lua
-    env.setGlobal('regex', {
-        match: (str, pattern) => {
-            const regex = new RegExp(pattern, 'g');
-            return str.match(regex);
-        },
-        replace: (str, pattern, replace) => {
-            const regex = new RegExp(pattern, 'g');
-            return str.replace(regex, replace);
-        },
-        test: (str, pattern) => {
-            const regex = new RegExp(pattern, 'g');
-            return regex.test(str);
-        }
-    });
-
-    // bind JSON functions to lua
-    env.setGlobal('JSON', {
-        stringify: (obj) => {
-            return JSON.stringify(obj);
-        },
-        parse: (str) => {
-            return JSON.parse(str);
-        }
-    });
-
-    // bind JS timer functions to lua
-    if (Context.getSetting('enableTimers')) {
-        env.setGlobal('setTimeout', (func, time, ...args) => {
-            return setTimeout(() => {
-                func(...args);
-            }, time);
-        });
-
-        env.setGlobal('setInterval', (func, time, ...args) => {
-            return setInterval(() => {
-                func(...args);
-            }, time);
-        });
-
-        env.setGlobal('clearTimeout', (id) => {
-            clearTimeout(id);
-        });
-
-        env.setGlobal('clearInterval', (id) => {
-            clearInterval(id);
-        });
-    }
-
-    // bind JS localStorage functions to lua
-    if (Context.getSetting('enableLocalStorage')) {
-        // bind JS localStorage to lua
-        env.setGlobal('js_localStorage', {
-            get: (key) => {
-                const value = localStorage.getItem(`ST-Ext-LUA::${key}`);
-                if (value === null) return undefined;
-                try {
-                    return JSON.parse(value);
-                }
-                catch (e) {
-                    console.error(`Error getting localStorage item: ${e}`);
-                    return undefined;
-                }
-            },
-            set: (key, value) => {
-                if (value === null) {
-                    localStorage.removeItem(`ST-Ext-LUA::${key}`);
-                    return true;
-                }
-                try {
-                    const json_value = JSON.stringify(value);
-                    localStorage.setItem(`ST-Ext-LUA::${key}`, json_value);
-                    return true;
-                }
-                catch (e) {
-                    console.error(`Error setting localStorage item: ${e}`);
-                    return false;
-                }
-            }
-        });
-    }
-
-    // allow access to toastr to display notifications
-    env.setGlobal('toastr', {
-        success: (...args) => toastr.success(...args),
-        info: (...args) => toastr.info(...args),
-        warning: (...args) => toastr.warning(...args),
-        error: (...args) => toastr.error(...args)
-    });
-
-    // bind Dom Manipulation functions to lua
-    if (Context.getSetting('enableDomManipulation')) {
-        env.setGlobal('Document', DomManipulator);
-    }
-
-    // bind fetch function to lua
-    if (Context.getSetting('enableFetch')) {
-        env.setGlobal('fetch', async (url, options) => {
-            try {
-                const response = await fetch(url, options);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch url ${url}`);
-                }
-                const response_type = response.headers.get('content-type');
-                if (response_type.includes('application/json')) {
-                    return response.json();
-                } else if (response_type.includes('text/html')) {
-                    return response.text();
-                } else {
-                    throw new Error(`Unsupported response type: ${response_type}`);
-                }
-            } catch (error) {
-                console.error(`Error fetching url ${url}: ${error}`);
-                return null;
-            }
-        });
-    }
-
+    // Create Lua bindings
+    await SetupBindings(self, env);
 
     // load bundled lua files
-    self.loadFiles([
+    await self.loadFiles([
         // Core Libraries
         ["common/string.lua", { module: true, namespace: "Common.string" }], // String Utilities
         ["common/table.lua", { module: true, namespace: "Common.table" }], // Table Utilities
         ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }], // Local Storage
         ["common/eventmanager.lua", { module: true, namespace: "EventManager" }], // Event Manager
+        ["common/LazyTimer.lua", { module: true, namespace: "LazyTimer" }], // LazyTimer
         ["common/init.lua", { module: true, namespace: "Common" }], // Common Library
         // Third Party Libraries.
         ["libs/inspect.lua", { module: true, namespace: "Inspect" }], // Inspect, Human Readable Table Printing
@@ -339,7 +229,7 @@ const SetupEnv = (self, env) => { // Modify the Lua State Available to ST here
     ]).catch(console.error);
 
 
-    // register events
+    // register events from SillyTavern to lua
     const { eventSource, eventTypes } = SillyTavern.getContext()
     // eslint-disable-next-line no-unused-vars
     for (const [_, value] of Object.entries(eventTypes)) {
@@ -347,6 +237,9 @@ const SetupEnv = (self, env) => { // Modify the Lua State Available to ST here
             env.execute(`if Events then Events:emit("${value}", ...) end`, [...args]);
         });
     }
+
+    // load global scripts (user defined modules)
+    await self.loadGlobalScripts().catch(console.error);
 }
 
 const Lua = new LuaEnv();
