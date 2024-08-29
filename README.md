@@ -1,5 +1,5 @@
 # Extension-Lua
-Provides Lua Scripting support for ST
+Provides Lua Scripting support for ST (based on [wasmoon](https://github.com/ceifa/wasmoon).)
 
 ## How to use
 
