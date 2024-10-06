@@ -204,6 +204,8 @@
 ---@field public Popup function
 ---@field public POPUP_TYPE table<string, number>
 ---@field public POPUP_RESULT table<string, number | nil>
+---@field public registerFunctionTool function
+---@field public unregisterFunctionTool function
 
 
 ---@class SillyTavern

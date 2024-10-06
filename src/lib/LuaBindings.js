@@ -20,6 +20,8 @@
 /* global toastr */
 import DomManipulator from '../utils/DomManipulator';
 import Context from '../Context';
+// eslint-disable-next-line no-unused-vars
+import LuaCanvasElement from '../components/LuaCanvas'; // make our custom element available to the browser
 
 
 export default function SetupBindings(self, env) {
@@ -146,4 +148,11 @@ export default function SetupBindings(self, env) {
             }
         });
     }
+
+    // bind a builder for creating LuaCanvas elements.
+    env.setGlobal('CreateLuaCanvas', (options) => {
+        /** @type {LuaCanvasElement} */
+        const canvas = document.createElement('lua-canvas', options);
+        return canvas;
+    });
 }

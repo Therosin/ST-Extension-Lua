@@ -7,7 +7,6 @@ import App from './App';
 import Lua from './lib/LuaEnv';
 import Context from './Context';
 
-
 /**
  * Execute a Global Lua Script by Id
  * @param {string} scriptId - the id of the script to execute

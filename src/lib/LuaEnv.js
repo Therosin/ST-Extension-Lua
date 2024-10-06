@@ -220,10 +220,12 @@ const SetupEnv = async (self, env) => { // Modify the Lua State Available to ST 
         ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }], // Local Storage
         ["common/eventmanager.lua", { module: true, namespace: "EventManager" }], // Event Manager
         ["common/LazyTimer.lua", { module: true, namespace: "LazyTimer" }], // LazyTimer
+        ["common/tool_calling.lua", { module: true, namespace: "ToolCalling", dependencies: ["libs/pandora.lua"] }], // Tool Calling
         ["common/init.lua", { module: true, namespace: "Common" }], // Common Library
         // Third Party Libraries.
         ["libs/inspect.lua", { module: true, namespace: "Inspect" }], // Inspect, Human Readable Table Printing
         ["libs/pandora.lua", { module: true, namespace: "Pandora" }], // Pandora Class Library
+        ["libs/LunaQuery.lua", { module: true, namespace: "LunaQuery" }], // LunaQuery, Linq like Query Library
         // Main init file.
         "init.lua",
     ]).catch(console.error);
