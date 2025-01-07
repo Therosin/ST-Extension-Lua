@@ -4,6 +4,7 @@
 import { createLuaBridge } from './LuaBridge';
 import Context from '../Context';
 import SetupBindings from './LuaBindings';
+import SetupWindowBindings from './LuaWindowBindings';
 
 
 /**
@@ -205,23 +206,26 @@ export class LuaEnv {
  * @param {Object} env - The Lua environment object.
  * @returns {Promise<void>} - A promise that resolves when the environment setup is complete.
 */
-const SetupEnv = async (self, env) => { // Modify the Lua State Available to ST here    
+const SetupEnv = async (self, env) => {
+    // Set up SillyTavern Interop
+
     // SillyTavern Interop, contains anything exposed by SillyTavern this makes it available to Lua.
     env.setGlobal("SillyTavern", SillyTavern);
 
-    // Create Lua bindings
+    // Set up Lua bindings
     await SetupBindings(self, env);
+    await SetupWindowBindings(self, env);
 
     // load bundled lua files
     await self.loadFiles([
         // Core Libraries
-        ["common/string.lua", { module: true, namespace: "Common.string" }], // String Utilities
-        ["common/table.lua", { module: true, namespace: "Common.table" }], // Table Utilities
-        ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }], // Local Storage
-        ["common/eventmanager.lua", { module: true, namespace: "EventManager" }], // Event Manager
-        ["common/LazyTimer.lua", { module: true, namespace: "LazyTimer" }], // LazyTimer
-        ["common/tool_calling.lua", { module: true, namespace: "ToolCalling", dependencies: ["libs/pandora.lua"] }], // Tool Calling
-        ["common/init.lua", { module: true, namespace: "Common" }], // Common Library
+        ["common/string.lua", { module: true, namespace: "Common.string" }],
+        ["common/table.lua", { module: true, namespace: "Common.table" }],
+        ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }],
+        ["common/eventmanager.lua", { module: true, namespace: "EventManager" }],
+        ["common/LazyTimer.lua", { module: true, namespace: "LazyTimer" }],
+        ["common/tool_calling.lua", { module: true, namespace: "ToolCalling", dependencies: ["libs/pandora.lua"] }],
+        ["common/init.lua", { module: true, namespace: "Common" }],
         // Third Party Libraries.
         ["libs/inspect.lua", { module: true, namespace: "Inspect" }], // Inspect, Human Readable Table Printing
         ["libs/pandora.lua", { module: true, namespace: "Pandora" }], // Pandora Class Library

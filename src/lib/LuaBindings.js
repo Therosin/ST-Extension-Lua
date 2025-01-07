@@ -23,7 +23,6 @@ import Context from '../Context';
 // eslint-disable-next-line no-unused-vars
 import LuaCanvasElement from '../components/LuaCanvas'; // make our custom element available to the browser
 
-
 export default function SetupBindings(self, env) {
 
 
@@ -123,12 +122,12 @@ export default function SetupBindings(self, env) {
         error: (...args) => toastr.error(...args)
     });
 
-    // bind Dom Manipulation functions to lua, this allows lua to manipulate the DOM, eg. for creating UI.
+    // allows lua to manipulate the DOM, eg. for creating UI.
     if (Context.getSetting('enableDomManipulation')) {
         env.setGlobal('Document', DomManipulator);
     }
 
-    // bind fetch function to lua, this allows lua to fetch data from the web, should be used with caution.
+    // allows lua to fetch data from the web, should be used with caution.
     if (Context.getSetting('enableFetch')) {
         env.setGlobal('fetch', async (url, options) => {
             try {
