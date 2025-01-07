@@ -39,7 +39,11 @@ function App() {
         const element = document.createElement('div');
         const debouncedListChangeHandler = _.debounce(handleListChange, 500);
         ReactDOM.render(<EditScriptsPopup onListChange={debouncedListChangeHandler} initialList={Context.getGlobalScripts()} />, element);
-        context.callPopup(element, 'text', '', { wide: true, large: true });
+        context.callGenericPopup(element, 4, 'Global Scripts', {
+            large: true,
+            wider: true,
+            allowVerticalScrolling: true
+        });
     }
 
     function handleReload() {
