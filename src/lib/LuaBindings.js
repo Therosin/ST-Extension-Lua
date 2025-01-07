@@ -30,7 +30,6 @@ export default function SetupBindings(self, env) {
     // get js type information. eg: if (type(ctx) == "userdata") and jstype(ctx) == "object" then ... end
     env.setGlobal('jstype', (obj) => { return typeof obj })
 
-
     // bind JS regular expression functions to lua, this allows lua to use regex
     env.setGlobal('regex', {
         match: (str, pattern) => {
@@ -78,6 +77,9 @@ export default function SetupBindings(self, env) {
         env.setGlobal('clearInterval', (id) => {
             clearInterval(id);
         });
+
+        // js based sleep function, allows lua to sleep for a given amount of time.
+        env.setGlobal('_sleep_js', (ms) => new Promise(resolve => setTimeout(resolve, ms)));
     }
 
     // bind JS localStorage functions to lua, we prefix the keys with ST-Ext-LUA to avoid conflicts.

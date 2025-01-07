@@ -89,3 +89,11 @@ if (type(_G['setInterval']) == 'function' or jstype(_G['setInterval']) == 'funct
         Events:emit("tick")
     end, Extension.config.event_timer)
 end
+
+_G.sleep = function(ms)
+    if type(_G['_sleep_js']) == "nil" then
+        Log("Error: sleep function not available when timers are disabled.")
+        return
+    end
+    _G['_sleep_js'](ms):await()
+end
