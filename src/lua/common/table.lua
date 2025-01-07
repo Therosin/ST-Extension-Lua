@@ -232,7 +232,6 @@ end
 --- @param t table The table to retrieve elements from.
 --- @param count number The number of elements to retrieve.
 --- @param reverse boolean (optional) If true, retrieves elements in reverse order.
---- @return table elements.
 function table.elements(t, count, reverse)
     local result = {}
     local len = #t
