@@ -210,7 +210,7 @@ export default function SetupBindings(self, env) {
                     }
                 }
             }
-            if (!allowedHosts.some(host => new RegExp(`^${host.replace(/\*/g, '[^/]*').replace(/\/$/, '')}.*$`, 'i').test(url))) {
+            if (!allowedHosts.some(host => new RegExp(`^${host.replace(/\*/g, '[^/]*')}`, 'i').test(url))) {
                 throw new Error(`Host not allowed: ${url}`);
             }
 
