@@ -30,17 +30,22 @@ export default function SetupBindings(self, env) {
     env.setGlobal('jstype', (obj) => { return typeof obj })
 
     // bind JS regular expression functions to lua, this allows lua to use regex
+    const allowedFlags = /^[gimu]*$/;
+
     env.setGlobal('regex', {
-        match: (str, pattern) => {
-            const regex = new RegExp(pattern, 'g');
+        match: (str, pattern, flags = 'g') => {
+            if (!allowedFlags.test(flags)) throw new Error(`Invalid flags: ${flags}`);
+            const regex = new RegExp(pattern, flags);
             return str.match(regex);
         },
-        replace: (str, pattern, replace) => {
-            const regex = new RegExp(pattern, 'g');
-            return str.replace(regex, replace);
+        replace: (str, pattern, replacement, flags = 'g') => {
+            if (!allowedFlags.test(flags)) throw new Error(`Invalid flags: ${flags}`);
+            const regex = new RegExp(pattern, flags);
+            return str.replace(regex, replacement);
         },
-        test: (str, pattern) => {
-            const regex = new RegExp(pattern, 'g');
+        test: (str, pattern, flags = 'g') => {
+            if (!allowedFlags.test(flags)) throw new Error(`Invalid flags: ${flags}`);
+            const regex = new RegExp(pattern, flags);
             return regex.test(str);
         }
     });
