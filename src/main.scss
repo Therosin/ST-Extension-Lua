@@ -32,9 +32,10 @@
 
 /* Container for Lua scripts */
 .extension-lua-scripts-container {
+  width: 100%;
+  height: calc(80dvh - 2rem) !important; /* Limit the height of the container */
   display: flex;
-  height: 100%;
-  gap: 10px; /* Add spacing between the list and editor */
+  gap: 10px;
 }
 
 /* Header for Lua scripts */
@@ -45,12 +46,13 @@
 
 /* List of Lua scripts */
 .extension-lua-scripts-list {
-  flex: 0 0 200px; /* Fixed width for the list */
+  flex: 1; /* Take up remaining space */
   max-width: 250px; /* Prevent the list from growing too wide */
-  overflow-y: auto;
+  max-height: calc(80dvh - 2rem) !important; /* Limit the height of the list */
   padding: 10px;
   background-color: #2a2a2a;
   border-right: 1px solid #444; /* Separate visually from the editor */
+  overflow: auto !important; /* Ensure the list is scrollable */
 }
 
 /* Container for individual Lua script */
@@ -82,7 +84,7 @@
 
 /* Code input area */
 .extension-lua-scripts-list-script-codeInput {
-  flex: 1; /* Stretch to fill the container */
+  flex: 1; /* Take up remaining space */
   padding: 10px;
   border: 1px solid #444;
   border-radius: 4px;
@@ -90,6 +92,7 @@
   color: #fff;
   font-size: 14px;
   font-family: monospace;
+  min-height: 200px;
 }
 
 /* Code editor container */
@@ -99,4 +102,5 @@
   flex-direction: column;
   padding: 10px;
   overflow: auto;
+  min-height: 200px;
 }

@@ -40,7 +40,7 @@ function EditScriptsPopup({ onListChange, initialList }) {
     };
 
     return (
-        <div className="flex-container flexFlowColumn extension-lua-scripts-container">
+        <div className="flex-container flexFlowColumn">
             <div className="flex-container justifySpaceBetween alignItemsCenter extension-lua-scripts-header">
                 <h3 className="margin0">Global Scripts</h3>
                 <div className="menu_button menu_button_icon" onClick={handleAdd}>

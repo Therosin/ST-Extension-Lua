@@ -42,7 +42,7 @@ function App() {
         context.callGenericPopup(element, 4, 'Global Scripts', {
             large: true,
             wider: true,
-            allowVerticalScrolling: true
+            allowVerticalScrolling: false
         });
     }
 
