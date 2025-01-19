@@ -10,26 +10,35 @@ import EditScriptsPopup from './components/EditScriptsPopup';
 import './main.scss';
 
 function App() {
+    // ─── State Management ──────────────────────────────────────────────────
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isDevMode, setIsDevMode] = useState(false);
     const [settings, setSettings] = useState({
+        // ─── Toggles ─────────────────────────────────────────────────
         enableTimers: false,
         enableLocalStorage: false,
         enableFetch: false,
-        enableDomManipulation: false
+        enableDomManipulation: false,
+
+        // ─── Config ──────────────────────────────────────────────────
+        fetchWhitelist: [],
     });
 
+    // ─── Effects ────────────────────────────────────────────────────────────
     useEffect(() => {
         // Retrieve initial settings from Context
         const initialSettings = {
             enableTimers: Context.getSetting('enableTimers'),
             enableLocalStorage: Context.getSetting('enableLocalStorage'),
             enableFetch: Context.getSetting('enableFetch'),
-            enableDomManipulation: Context.getSetting('enableDomManipulation')
+            enableDomManipulation: Context.getSetting('enableDomManipulation'),
+            fetchWhitelist: Context.getSetting('fetchWhitelist'),
         };
         setSettings(initialSettings);
     }, []);
 
+
+    // ─── Event Handlers ────────────────────────────────────────────────────
     function toggleDrawer() {
         setIsDrawerOpen(!isDrawerOpen);
     }
@@ -85,6 +94,7 @@ function App() {
 
     return (
         <div className="extension-lua-scripts-settings">
+            {/* ─── Drawer Header ───────────────────────────────────────────── */}
             <div className="inline-drawer">
                 <div className="inline-drawer-toggle inline-drawer-header" onClick={toggleDrawer}>
                     <b>Lua Scripts</b>
@@ -92,6 +102,7 @@ function App() {
                 </div>
                 {isDrawerOpen && (
                     <div className="inline-drawer-content">
+                        {/* ─── Menu Buttons ───────────────────────────────────── */}
                         <div className="flex-container extension-lua-scripts-menu">
                             <div onClick={handleClick} className="menu_button menu_button_icon flexGap5" title="Lua Scripts">
                                 <i className="fa-solid fa-code"></i>
@@ -106,6 +117,8 @@ function App() {
                                 <span>Dev</span>
                             </div>
                         </div>
+
+                        {/* ─── Settings Section ──────────────────────────────── */}
                         <div className="flex-container extension-lua-scripts-settings-container">
                             <div className="extension-lua-scripts-settings-header">
                                 <b>Settings</b><br />
@@ -142,6 +155,22 @@ function App() {
                                         DOM Manipulation
                                     </label>
                                     <span className="extension-lua-scripts-settings-description">Allow scripts to manipulate the DOM, use with caution. this can cause security issues.</span>
+                                </div>
+                            </div>
+                            <hr />
+                            <div className="extension-lua-scripts-settings-row">
+                                <div className="extension-lua-scripts-setting">
+                                    <label htmlFor="fetchWhitelist">
+                                        <span className="extension-lua-scripts-settings-description">
+                                            Whitelist of URLs that scripts are allowed to fetch. (one per line), you can use wildcards (*) in the URL. eg.
+                                            <pre>[*|http|https]://([*|sub-domain].)?example.com(/[*|path])?</pre>
+                                        </span>
+                                    </label>
+                                    <textarea
+                                        id="fetchWhitelist"
+                                        value={settings.fetchWhitelist}
+                                        onChange={(e) => handleSettingChange('fetchWhitelist', e.target.value)}
+                                    />
                                 </div>
                             </div>
                         </div>
