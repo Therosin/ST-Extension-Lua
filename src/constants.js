@@ -11,6 +11,10 @@ export const DEFAULT_SETTINGS = {
     enableLocalStorage: false,
     /** Allow the use of Fetch */
     enableFetch: false,
+    /** Fetch whitelist with wildcard support */
+    fetchWhitelist: `
+    https://docs.sillytavern.app/*
+    `,
     /** Allow the use of DOM manipulation */
     enableDomManipulation: false,
 };
