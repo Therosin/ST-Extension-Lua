@@ -31,24 +31,41 @@ export default function SetupBindings(self, env) {
 
     // bind JS regular expression functions to lua, this allows lua to use regex
     const allowedFlags = /^[gimu]*$/;
+    const maxPatternLength = 1000;
 
     env.setGlobal('regex', {
         match: (str, pattern, flags = 'g') => {
+            if (pattern.length > maxPatternLength) throw new Error(`Pattern exceeds maximum length of ${maxPatternLength} characters.`);
             if (!allowedFlags.test(flags)) throw new Error(`Invalid flags: ${flags}`);
-            const regex = new RegExp(pattern, flags);
-            return str.match(regex);
+            try {
+                const regex = new RegExp(pattern, flags);
+                return str.match(regex);
+            } catch (e) {
+                throw new Error(`Invalid regex pattern: ${pattern}`);
+            }
         },
         replace: (str, pattern, replacement, flags = 'g') => {
+            if (pattern.length > maxPatternLength) throw new Error(`Pattern exceeds maximum length of ${maxPatternLength} characters.`);
             if (!allowedFlags.test(flags)) throw new Error(`Invalid flags: ${flags}`);
-            const regex = new RegExp(pattern, flags);
-            return str.replace(regex, replacement);
+            try {
+                const regex = new RegExp(pattern, flags);
+                return str.replace(regex, replacement);
+            } catch (e) {
+                throw new Error(`Invalid regex pattern: ${pattern}`);
+            }
         },
         test: (str, pattern, flags = 'g') => {
+            if (pattern.length > maxPatternLength) throw new Error(`Pattern exceeds maximum length of ${maxPatternLength} characters.`);
             if (!allowedFlags.test(flags)) throw new Error(`Invalid flags: ${flags}`);
-            const regex = new RegExp(pattern, flags);
-            return regex.test(str);
+            try {
+                const regex = new RegExp(pattern, flags);
+                return regex.test(str);
+            } catch (e) {
+                throw new Error(`Invalid regex pattern: ${pattern}`);
+            }
         }
     });
+
 
     // bind JSON functions to lua, faster than using some json library.
     env.setGlobal('JSON', {
