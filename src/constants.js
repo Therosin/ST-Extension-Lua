@@ -18,3 +18,35 @@ export const DEFAULT_SETTINGS = {
     /** Allow the use of DOM manipulation */
     enableDomManipulation: false,
 };
+
+
+/**
+ * Core Scripts/Modules to be loaded into the Lua Environment.
+ * Each entry is a tuple with the first element being the path to the script and the second element being an object with the following properties:
+ * - module: boolean - Whether the file should be treated as a module.
+ * - namespace: string - The namespace under which the module should be registered. (required if module is true, literal string that will be used to require the module in Lua)
+ * - dependencies: string[] - An array of dependencies that must be loaded before this file.
+ * - initCode: string - Additional Lua code to run before the file's main content (Optional, not recommended though can be used to set up global variables or functions).
+ * 
+ * The order of the scripts in this array is important as the scripts will be loaded in the order they appear, though due to timing issues, dependencies may not be loaded in the order they appear.
+ * To avoid dependency issues, it is recommended to use the dependencies property to specify dependents so we can sort them properly later.
+ * 
+ * @type {Array<[string, import('./lib/LuaFileLoader').LuaFileOptions]>}
+ *
+*/
+export const CORE_SCRIPTS = [
+    // Core Libraries
+    ["common/string.lua", { module: true, namespace: "Common.string" }],
+    ["common/table.lua", { module: true, namespace: "Common.table" }],
+    ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }],
+    ["common/eventmanager.lua", { module: true, namespace: "EventManager" }],
+    ["common/LazyTimer.lua", { module: true, namespace: "LazyTimer" }],
+    ["common/tool_calling.lua", { module: true, namespace: "ToolCalling", dependencies: ["libs/pandora.lua"] }],
+    ["common/init.lua", { module: true, namespace: "Common", dependencies: ["common/eventmanager.lua", "common/localStorage.lua"] }],
+    // Third Party Libraries.
+    ["libs/inspect.lua", { module: true, namespace: "Inspect" }], // Inspect, Human Readable Table Printing
+    ["libs/pandora.lua", { module: true, namespace: "Pandora" }], // Pandora Class Library
+    ["libs/LunaQuery.lua", { module: true, namespace: "LunaQuery" }], // LunaQuery, Linq like Query Library
+    // Main init file.
+    ["init.lua", { dependencies: ["common/init.lua", "libs/inspect.lua"] }],
+];
