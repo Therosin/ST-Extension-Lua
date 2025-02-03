@@ -77,29 +77,25 @@ export default function SetupBindings(self, env) {
         }
     });
 
-    // bind JS timer functions to lua, allows lua to use timers and intervals for scheduling.
+    // Bind Lua-accessible timers using `LuaEnv`'s managed system
     if (Context.getSetting('enableTimers')) {
         env.setGlobal('setTimeout', (func, time, ...args) => {
-            return setTimeout(() => {
-                func(...args);
-            }, time);
+            return self.setLuaTimeout(func, time, ...args);
         });
 
         env.setGlobal('setInterval', (func, time, ...args) => {
-            return setInterval(() => {
-                func(...args);
-            }, time);
+            return self.setLuaInterval(func, time, ...args);
         });
 
         env.setGlobal('clearTimeout', (id) => {
-            clearTimeout(id);
+            self.clearLuaTimeout(id);
         });
 
         env.setGlobal('clearInterval', (id) => {
-            clearInterval(id);
+            self.clearLuaInterval(id);
         });
 
-        // js based sleep function, allows lua to sleep for a given amount of time.
+        // JS-based sleep function, allows Lua to sleep for a given amount of time.
         env.setGlobal('_sleep_js', (ms) => new Promise(resolve => setTimeout(resolve, ms)));
     }
 
