@@ -38,11 +38,12 @@ export const CORE_SCRIPTS = [
     // Core Libraries
     ["common/string.lua", { module: true, namespace: "Common.string" }],
     ["common/table.lua", { module: true, namespace: "Common.table" }],
+    ["common/logging.lua", { module: true, namespace: "Logging", dependencies: ["common/string.lua"] }],
     ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }],
     ["common/eventmanager.lua", { module: true, namespace: "EventManager" }],
     ["common/LazyTimer.lua", { module: true, namespace: "LazyTimer" }],
     ["common/tool_calling.lua", { module: true, namespace: "ToolCalling", dependencies: ["libs/pandora.lua"] }],
-    ["common/init.lua", { module: true, namespace: "Common", dependencies: ["common/eventmanager.lua", "common/localStorage.lua"] }],
+    ["common/init.lua", { module: true, namespace: "Common", dependencies: ["common/eventmanager.lua", "common/localStorage.lua", "common/logging.lua"] }],
     // Third Party Libraries.
     ["libs/inspect.lua", { module: true, namespace: "Inspect" }], // Inspect, Human Readable Table Printing
     ["libs/pandora.lua", { module: true, namespace: "Pandora" }], // Pandora Class Library
@@ -50,3 +51,15 @@ export const CORE_SCRIPTS = [
     // Main init file.
     ["init.lua", { dependencies: ["common/init.lua", "libs/inspect.lua"] }],
 ];
+
+/**
+ * Maximum number of Timers that can be created by the Lua Environment.
+ * @type {number}
+*/
+export const MAX_LUA_TIMERS = 50;
+
+/**
+ * Maximum number of Intervals that can be created by the Lua Environment.
+ * @type {number}
+*/
+export const MAX_LUA_INTERVALS = 50;
