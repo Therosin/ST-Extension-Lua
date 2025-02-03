@@ -16,6 +16,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with ST-Extension-Lua.  If not, see <https://www.gnu.org/licenses/>.
 local EventManager = require "EventManager" ---@type EventManager
+local Log = require "Logging" ---@type Logger
 
 -- Disable Debugging by default.
 _G.DEBUG = false
@@ -23,7 +24,7 @@ _G.DEBUG = false
 -- Global Extension Object.
 local Extension = {
     name = "ST-Extension-Lua",
-    version = "1.2.1",
+    version = "1.2.5",
     author = "Theros <github/therosin>",
     config = {
         event_timer = 1000
@@ -35,9 +36,8 @@ _G.Extension = Extension
 _G.unpack = unpack or table.unpack;
 
 -- General Logging.
-_G.Log = function(message, ...)
-    print(string.format("[%s] " .. message, Extension.name, ...))
-end
+_G.Log = Log
+Log("Initializing ${name} v${version} by ${author}", Extension)
 
 -- Setup LocalStorage.
 if not (js_localStorage == nil) then
@@ -46,7 +46,7 @@ if not (js_localStorage == nil) then
     local config = localStorage.get("config") or {}
 
     if config.version == nil then
-        Log("Initializing config")
+        Log.warn("Initializing config for the first time.")
         config.version = Extension.version
         for key, value in pairs(Extension.config) do
             config[key] = value
@@ -55,7 +55,7 @@ if not (js_localStorage == nil) then
     end
 
     if config.version ~= Extension.version then
-        Log("Updating config from version " .. config.version .. " to " .. Extension.version)
+        Log.warn("Updating config from version ${old} to ${new}", { old = config.version, new = Extension.version })
         config.version = Extension.version
         --- settings update logic here later...
         localStorage.set("config", config)
@@ -75,30 +75,47 @@ _G.Events = EventManager("ST-Lua-EventManager")
 Events:emit("lua::startup")
 Events:on("tick", function()
     if DEBUG then
-        Log("Debug :: EventLoop.Tick")
+        Log.debug("EventLoop > Tick")
     end
 end)
 
 -- Setup Main Event Loop.
-local main_timer;
 if (type(_G['setInterval']) == 'function' or jstype(_G['setInterval']) == 'function') then
-    main_timer = setInterval(function()
-        Events:set_error(function(err)
-            clearInterval(main_timer)
-            Log("Error in event loop: " .. err)
-        end)
+    if main_loop_timer ~= nil then
+        Log.warn(
+        "Existing main_loop_timer detected (ID: ${timer}), stopping previous interval before starting a new one.",
+            { timer = main_loop_timer })
+        clearInterval(main_loop_timer)
+    end
+    _G.main_loop_timer = setInterval(function()
         Events:emit("tick")
     end, Extension.config.event_timer)
 
+    Log.info("Event Loop Initialized with ${ms}ms interval (ID: ${timer})",
+        { ms = Extension.config.event_timer, timer = main_loop_timer })
+
+    Events:set_error(function(err)
+        clearInterval(main_loop_timer)
+        Log.error("Event loop error: ${msg} | Stopping interval (ID: ${timer})", { msg = err, timer = main_loop_timer })
+    end)
+
     -- Listen for shutdown event.
     Events:on("lua::shutdown", function()
-        clearInterval(main_timer)
+        Log.info("Shutdown signal received. Stopping event loop (ID: ${timer})", { timer = main_loop_timer })
+        if main_loop_timer then
+            Log.info("Clearing interval (ID: ${timer})", { timer = main_loop_timer })
+            clearInterval(main_loop_timer)
+            _G.main_loop_timer = nil -- Ensure it's unset
+        else
+            Log.warn("Shutdown executed, but main_loop_timer was already nil.")
+        end
     end)
 end
 
+
 _G.sleep = function(ms)
     if type(_G['_sleep_js']) == "nil" then
-        Log("Error: sleep function not available when timers are disabled.")
+        Log.error("sleep function not available when timers are disabled.")
         return
     end
     _G['_sleep_js'](ms):await()
