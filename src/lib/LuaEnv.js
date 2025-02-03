@@ -5,7 +5,7 @@ import { createLuaBridge } from './LuaBridge';
 import Context from '../Context';
 import SetupBindings from './LuaBindings';
 import SetupWindowBindings from './LuaWindowBindings';
-import { CORE_SCRIPTS } from '../constants';
+import { CORE_SCRIPTS, MAX_LUA_TIMERS, MAX_LUA_INTERVALS } from '../constants';
 import { createLuaFileMap, topologicalLuaFileSort } from './LuaFileLoader';
 
 /**
@@ -16,13 +16,17 @@ export class LuaEnv {
     constructor() {
         this.Lua = null;
         this.GlobalScripts = [];
+        this.activeIntervals = new Map(); // Track intervals
+        this.activeTimeouts = new Map(); // Track timeouts
+        this.intervalIdCounter = 1; // Unique IDs for intervals
+        this.timeoutIdCounter = 1; // Unique IDs for timeouts
+        this.maxIntervals = MAX_LUA_INTERVALS; // Maximum number of intervals
+        this.maxTimeouts = MAX_LUA_TIMERS; // Maximum number of timeouts
     }
 
     /**
      * Initializes the Lua environment
-     * @returns {Promise<void>}
-     * @throws {string} If the global scripts cannot be registered
-    */
+     */
     async init() {
         if (this.Lua == null) {
             this.Lua = await createLuaBridge();
@@ -33,15 +37,21 @@ export class LuaEnv {
 
     /**
      * Shuts down the Lua environment
-     * @returns {Promise<void>}
-     * @throws {string} If Lua is not initialized
-    */
+     */
     shutdown() {
         return new Promise((resolve, reject) => {
             if (this.Lua == null) reject('Lua is not initialized');
-            this.Lua.execute('if Events then Events:emit("lua::shutdown") end', {}); // Emit shutdown event to Lua
+
+            console.log("Extension-Lua: Emitting shutdown event to Lua");
+            this.Lua.execute('if Events then Events:emit("lua::shutdown") end', {});
+
+            console.log("Extension-Lua: Clearing all managed intervals and timeouts...");
+            this.clearAllTimers();
+
+            console.log("Extension-Lua: Closing Lua environment handle...");
             this.Lua.close();
             this.Lua = null;
+
             resolve();
         });
     }
@@ -130,6 +140,68 @@ export class LuaEnv {
                 files = files.filter(f => !dependents.includes(f) && !(Array.isArray(f) ? f[0] : f === filePath));
             }
         }
+    }
+
+    /**
+ * Custom Lua-bound setInterval that tracks timers
+ */
+    setLuaInterval(callback, time, ...args) {
+        const id = this.intervalIdCounter++;
+        const timerId = setInterval(() => {
+            if (this.Lua) {
+                callback(...args);
+            } else {
+                this.clearLuaInterval(id); // Auto-clean if Lua is shut down
+            }
+        }, time);
+        this.activeIntervals.set(id, timerId);
+        return id;
+    }
+
+    /**
+     * Custom Lua-bound clearInterval
+     */
+    clearLuaInterval(id) {
+        if (this.activeIntervals.has(id)) {
+            clearInterval(this.activeIntervals.get(id));
+            this.activeIntervals.delete(id);
+        }
+    }
+
+    /**
+     * Custom Lua-bound setTimeout that tracks timers
+     */
+    setLuaTimeout(callback, time, ...args) {
+        const id = this.timeoutIdCounter++;
+        const timerId = setTimeout(() => {
+            if (this.Lua) {
+                callback(...args);
+            }
+            this.activeTimeouts.delete(id); // Remove after execution
+        }, time);
+        this.activeTimeouts.set(id, timerId);
+        return id;
+    }
+
+    /**
+     * Custom Lua-bound clearTimeout
+     */
+    clearLuaTimeout(id) {
+        if (this.activeTimeouts.has(id)) {
+            clearTimeout(this.activeTimeouts.get(id));
+            this.activeTimeouts.delete(id);
+        }
+    }
+
+    /**
+     * Clears all Lua-managed timers
+     */
+    clearAllTimers() {
+        this.activeIntervals.forEach(clearInterval);
+        this.activeIntervals.clear();
+
+        this.activeTimeouts.forEach(clearTimeout);
+        this.activeTimeouts.clear();
     }
 }
 
