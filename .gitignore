@@ -25,3 +25,6 @@ codealike.json
 package-lock.json
 .anima
 genaisrc
+.genaiscript/cache
+.genaiscript/runs
+.genaiscript/stats
