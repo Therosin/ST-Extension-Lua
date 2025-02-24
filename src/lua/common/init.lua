@@ -18,6 +18,28 @@
 ---@diagnostic disable-next-line: deprecated
 local unpack = table.unpack or unpack
 
+
+
+--- Reset a function that only runs once.
+---@alias RunOnceReset fun()
+
+--- Returns a function that only runs once, subsequent calls will do nothing.
+---@generic T                                                 return type of the function.
+---@param fn fun(...):T?                                      function to run once.
+---@return { __call: fun(...):T; reset: RunOnceReset }        function that only runs once.
+function _G.OnlyRunOnce(fn)
+    local ran = false
+    return setmetatable({}, {
+        __call = function(_, ...)
+            if not ran then
+                ran = true
+                return fn(...)
+            end
+        end,
+        reset = function() ran = false end
+    })
+end
+
 local Common = {
     DEBUG_ENABLED = false, -- set to true to enable debug messages
 }

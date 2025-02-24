@@ -17,8 +17,7 @@
 
 --[[
     This file contains a simple event system for Lua.
-    tries to mimic the event system in C#.
-    It also contains a simple coroutine based event loop.
+    It is based on the EventEmitter class from Node.js.
 --]]
 
 ---@class EventManager
