@@ -31,6 +31,50 @@ export default function SetupBindings(self, env) {
     // get js type information. eg: if (type(ctx) == "userdata") and jstype(ctx) == "object" then ... end
     env.setGlobal('jstype', (obj) => { return typeof obj })
 
+    // generic Object, Array, and Function checks
+    env.setGlobal('isObject', (obj) => { return typeof obj === 'object' });
+    env.setGlobal('isArray', (obj) => { return Array.isArray(obj) });
+    env.setGlobal('isFunction', (obj) => { return typeof obj === 'function' });
+
+    // generic Object, Array manipulation.
+    env.setGlobal('Object', (obj) => {
+        return {
+            keys: () => Object.keys(obj),
+            values: () => Object.values(obj),
+            entries: () => Object.entries(obj),
+            has: (key) => obj.hasOwnProperty(key),
+            get: (key) => obj[key],
+            set: (key, value) => obj[key] = value,
+            delete: (key) => delete obj[key]
+        };
+    });
+
+    env.setGlobal('Array', (arr) => {
+        return {
+            length: arr.length,
+            push: (...items) => arr.push(...items),
+            pop: () => arr.pop(),
+            shift: () => arr.shift(),
+            unshift: (...items) => arr.unshift(...items),
+            slice: (start, end) => arr.slice(start, end),
+            splice: (start, deleteCount, ...items) => arr.splice(start, deleteCount, ...items),
+            indexOf: (searchElement, fromIndex) => arr.indexOf(searchElement, fromIndex),
+            lastIndexOf: (searchElement, fromIndex) => arr.lastIndexOf(searchElement, fromIndex),
+            includes: (searchElement, fromIndex) => arr.includes(searchElement, fromIndex),
+            find: (callback) => arr.find(callback),
+            findIndex: (callback) => arr.findIndex(callback),
+            filter: (callback) => arr.filter(callback),
+            map: (callback) => arr.map(callback),
+            reduce: (callback, initialValue) => arr.reduce(callback, initialValue),
+            reduceRight: (callback, initialValue) => arr.reduceRight(callback, initialValue),
+            forEach: (callback) => arr.forEach(callback),
+            every: (callback) => arr.every(callback),
+            some: (callback) => arr.some(callback),
+            sort: (compareFunction) => arr.sort(compareFunction),
+            reverse: () => arr.reverse()
+        };
+    });
+
     // bind JS regular expression functions to lua, this allows lua to use regex
     const allowedFlags = /^[gimu]*$/;
     const maxPatternLength = 1000;
