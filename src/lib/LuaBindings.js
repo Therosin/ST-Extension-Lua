@@ -25,6 +25,8 @@ import LuaCanvasElement from '../components/LuaCanvas'; // make our custom eleme
 
 export default function SetupBindings(self, env) {
 
+    // js null is not the same as lua nil, so we need a way to check/return null values in lua.
+    env.setGlobal('jsnull', null);
 
     // get js type information. eg: if (type(ctx) == "userdata") and jstype(ctx) == "object" then ... end
     env.setGlobal('jstype', (obj) => { return typeof obj })
@@ -74,7 +76,7 @@ export default function SetupBindings(self, env) {
         },
         parse: (str) => {
             return JSON.parse(str);
-        }
+        },
     });
 
     // Bind Lua-accessible timers using `LuaEnv`'s managed system
