@@ -110,14 +110,14 @@ end
 ---@param t table                                              table to copy
 ---@return table                                                 copied table
 function table.copy(t)
-    if type(t) ~= "table" and not (type(t) == "userdata" and jstype(t) == "Object") then
+    if type(t) ~= "table" and not (type(t) == "userdata" and jstype(t) == "object") then
         error("table.copy expects a table or a JS Object as an argument")
     end
 
     local copy = {}
 
     --- handle arrays
-    if (type(t) == "userdata" and jstype(t) == "Array") then
+    if (type(t) == "userdata" and jstype(t) == "array") then
         ---@diagnostic disable-next-line: param-type-mismatch
         for i, v in ipairs(t) do
             copy[i] = v
