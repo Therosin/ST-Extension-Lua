@@ -18,8 +18,22 @@ const DomManipulator = (function () {
     */
     function findElement(selector) {
         if (typeof selector !== 'string') throw new Error('Selector must be a string');
-        if (document.querySelector(selector) === null) throw new Error('Element not found');
-        return document.querySelector(selector);
+        const e = document.querySelector(selector)
+        if (!e) throw new Error('Element not found');
+        return e;
+    }
+
+    /**
+     * Find all matching elements in the DOM
+     * @param {string} selector - The selector to search for
+     * @returns {NodeList} - The elements found
+     * @throws {Error} - If the selector is not a string
+    */
+    function findElements(selector) {
+        if (typeof selector !== 'string') throw new Error('Selector must be a string');
+        const e = document.querySelectorAll(selector)
+        if (!typeof e === 'NodeList' || e.length === 0) throw new Error('Elements not found');
+        return e;
     }
 
 
@@ -118,6 +132,7 @@ const DomManipulator = (function () {
 
     return {
         findElement,
+        findElements,
         createElement,
         modifyElement,
         addEventListener,
