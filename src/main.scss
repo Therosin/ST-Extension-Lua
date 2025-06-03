@@ -5,65 +5,6 @@
   height: 100%;
 }
 
-/* Container for Lua scripts */
-.extension-lua-scripts-container {
-  height: 100%;
-  overflow: hidden;
-}
-
-/* Header for Lua scripts */
-.extension-lua-scripts-header {
-  border-bottom: 1px solid #e0e0e0;
-  padding: 10px 20px;
-}
-
-/* List of Lua scripts */
-.extension-lua-scripts-list {
-  padding: 20px;
-  overflow-y: auto;
-  flex-grow: 1;
-  max-height: 650px;
-}
-
-/* Container for individual Lua script */
-.extension-lua-scripts-list-script-container {
-  margin-bottom: 20px;
-}
-
-/* Header for individual Lua script */
-.extension-lua-scripts-list-script-header {
-  padding: 10px 20px;
-  border-bottom: 1px solid #e0e0e0;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-/* Input for script name */
-.extension-lua-scripts-list-script-nameInput {
-  width: 100%;
-  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  background-color: inherit;
-  color: inherit;
-  font-size: 14px;
-}
-
-.extension-lua-scripts-list-script-codeInput {
-  width: 100%;
-  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  background-color: inherit;
-  color: inherit;
-  font-size: 14px;
-  font-family: monospace;
-}
-
 /* Settings Section */
 .extension-lua-scripts-settings-header {
   font-weight: bold;
@@ -87,4 +28,79 @@
   font-size: 12px;
   color: #888;
   margin-top: 5px;
+}
+
+/* Container for Lua scripts */
+.extension-lua-scripts-container {
+  width: 100%;
+  height: calc(80dvh - 2rem) !important; /* Limit the height of the container */
+  display: flex;
+  gap: 10px;
+}
+
+/* Header for Lua scripts */
+.extension-lua-scripts-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 10px 20px;
+}
+
+/* List of Lua scripts */
+.extension-lua-scripts-list {
+  flex: 1; /* Take up remaining space */
+  max-width: 250px; /* Prevent the list from growing too wide */
+  max-height: calc(80dvh - 2rem) !important; /* Limit the height of the list */
+  padding: 10px;
+  background-color: #2a2a2a;
+  border-right: 1px solid #444; /* Separate visually from the editor */
+  overflow: auto !important; /* Ensure the list is scrollable */
+}
+
+/* Container for individual Lua script */
+.extension-lua-scripts-list-script-container {
+  margin-bottom: 20px;
+}
+
+/* Header for individual Lua script */
+.extension-lua-scripts-list-script-header {
+  padding: 10px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  justify-content: space-between;
+  align-items: flex-start;
+  display: flex;
+}
+
+/* Input for script name */
+.extension-lua-scripts-list-script-nameInput {
+  width: 100%; /* Use full width of its container */
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #1e1e1e;
+  color: #fff;
+  font-size: 14px;
+}
+
+/* Code input area */
+.extension-lua-scripts-list-script-codeInput {
+  flex: 1; /* Take up remaining space */
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #1e1e1e;
+  color: #fff;
+  font-size: 14px;
+  font-family: monospace;
+  min-height: 200px;
+}
+
+/* Code editor container */
+.extension-lua-scripts-code-editor {
+  flex: 1; /* Take up remaining space */
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  overflow: auto;
+  min-height: 200px;
 }

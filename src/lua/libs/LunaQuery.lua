@@ -857,10 +857,10 @@ do
         resultSelector = defaultResultSelector
       end
       resultSelector = getFunction(resultSelector)
+      local length = math.min(self.length, second.length)
       if length == 0 then
         return { }
       end
-      local length = math.min(self.length, second.length)
       local result, getItem1, getItem2 = { }, iter(self), iter(second)
       for i = 1, length do
         result[i] = resultSelector(getItem1(), getItem2())

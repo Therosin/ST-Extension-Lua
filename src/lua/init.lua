@@ -72,6 +72,7 @@ end
 
 -- Setup EventManager.
 _G.Events = EventManager("ST-Lua-EventManager")
+Events:emit("lua::startup")
 Events:on("tick", function()
     if DEBUG then
         Log("Debug :: EventLoop.Tick")
@@ -88,6 +89,11 @@ if (type(_G['setInterval']) == 'function' or jstype(_G['setInterval']) == 'funct
         end)
         Events:emit("tick")
     end, Extension.config.event_timer)
+
+    -- Listen for shutdown event.
+    Events:on("lua::shutdown", function()
+        clearInterval(main_timer)
+    end)
 end
 
 _G.sleep = function(ms)

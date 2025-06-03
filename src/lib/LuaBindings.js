@@ -23,7 +23,6 @@ import Context from '../Context';
 // eslint-disable-next-line no-unused-vars
 import LuaCanvasElement from '../components/LuaCanvas'; // make our custom element available to the browser
 
-
 export default function SetupBindings(self, env) {
 
 
@@ -31,20 +30,42 @@ export default function SetupBindings(self, env) {
     env.setGlobal('jstype', (obj) => { return typeof obj })
 
     // bind JS regular expression functions to lua, this allows lua to use regex
+    const allowedFlags = /^[gimu]*$/;
+    const maxPatternLength = 1000;
+
     env.setGlobal('regex', {
-        match: (str, pattern) => {
-            const regex = new RegExp(pattern, 'g');
-            return str.match(regex);
+        match: (str, pattern, flags = 'g') => {
+            if (pattern.length > maxPatternLength) throw new Error(`Pattern exceeds maximum length of ${maxPatternLength} characters.`);
+            if (!allowedFlags.test(flags)) throw new Error(`Invalid flags: ${flags}`);
+            try {
+                const regex = new RegExp(pattern, flags);
+                return str.match(regex);
+            } catch (e) {
+                throw new Error(`Invalid regex pattern: ${pattern}`);
+            }
         },
-        replace: (str, pattern, replace) => {
-            const regex = new RegExp(pattern, 'g');
-            return str.replace(regex, replace);
+        replace: (str, pattern, replacement, flags = 'g') => {
+            if (pattern.length > maxPatternLength) throw new Error(`Pattern exceeds maximum length of ${maxPatternLength} characters.`);
+            if (!allowedFlags.test(flags)) throw new Error(`Invalid flags: ${flags}`);
+            try {
+                const regex = new RegExp(pattern, flags);
+                return str.replace(regex, replacement);
+            } catch (e) {
+                throw new Error(`Invalid regex pattern: ${pattern}`);
+            }
         },
-        test: (str, pattern) => {
-            const regex = new RegExp(pattern, 'g');
-            return regex.test(str);
+        test: (str, pattern, flags = 'g') => {
+            if (pattern.length > maxPatternLength) throw new Error(`Pattern exceeds maximum length of ${maxPatternLength} characters.`);
+            if (!allowedFlags.test(flags)) throw new Error(`Invalid flags: ${flags}`);
+            try {
+                const regex = new RegExp(pattern, flags);
+                return regex.test(str);
+            } catch (e) {
+                throw new Error(`Invalid regex pattern: ${pattern}`);
+            }
         }
     });
+
 
     // bind JSON functions to lua, faster than using some json library.
     env.setGlobal('JSON', {
@@ -123,24 +144,123 @@ export default function SetupBindings(self, env) {
         error: (...args) => toastr.error(...args)
     });
 
-    // bind Dom Manipulation functions to lua, this allows lua to manipulate the DOM, eg. for creating UI.
+    // allows lua to manipulate the DOM, eg. for creating UI.
     if (Context.getSetting('enableDomManipulation')) {
         env.setGlobal('Document', DomManipulator);
     }
 
-    // bind fetch function to lua, this allows lua to fetch data from the web, should be used with caution.
+    /**
+     * Fetch Function Configuration
+     * 
+     * This module binds a secure `fetch` function to the Lua environment. The function allows Lua scripts
+     * to perform web requests with controlled methods, headers, and hosts. The response can include
+     * metadata and data in multiple formats such as JSON, text, Blob, or Blob URL.
+     * 
+     * Usage:
+     * ```javascript
+     * const response = fetch('https://example.com', {
+     *     method: 'GET',
+     *     headers: { 'Accept': 'application/json' },
+     *     blobUrl: true // Return a Blob URL for media types
+     * });
+     * 
+     * console.log(response.data); // Access returned data
+     * console.log(response.metadata); // Access response metadata
+     * ```
+    */
     if (Context.getSetting('enableFetch')) {
+        const allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
+        const allowedHeaders = ['Accept', 'Accept-Language', 'Content-Type', 'Authorization', 'Origin', 'Referer', 'User-Agent'];
+        const allowedHosts = ['*://localhost/*', '*://127.0.0.1/*'];
+        const allowedResponseTypes = ['application/json', 'text/html', 'text/plain', 'image/', 'video/', 'audio/'];
+
+        const userAllowedHosts = Context.getFetchWhitelist();
+        if (userAllowedHosts) {
+            allowedHosts.push(...userAllowedHosts);
+        }
+
+        /**
+         * Performs a web request with the specified options.
+         *
+         * @param {string} url - The URL to fetch.
+         * @param {Object} [options] - Fetch options.
+         * @param {string} [options.method='GET'] - HTTP method (e.g., GET, POST).
+         * @param {Object} [options.headers] - Custom headers to include in the request.
+         * @param {boolean} [options.blobUrl=false] - Whether to return a Blob URL for media types.
+         * @returns {Promise<Object>} A promise resolving to an object containing `data` and `metadata`.
+         * @throws {Error} If the URL, method, headers, or response type is invalid.
+        */
         env.setGlobal('fetch', async (url, options) => {
+            if (typeof url !== 'string') {
+                throw new Error('Invalid url');
+            }
+            if (options === null || typeof options !== 'object') {
+                throw new Error('Invalid options');
+            }
+            if (!options.method) {
+                options.method = 'GET';
+            }
+            if (!allowedMethods.includes(options.method)) {
+                throw new Error(`Invalid method: ${options.method}`);
+            }
+            if (options.headers && typeof options.headers === 'object' && !(options.headers instanceof Headers)) {
+                for (const header in options.headers) {
+                    if (!allowedHeaders.includes(header)) {
+                        throw new Error(`Invalid header: ${header}`);
+                    }
+                }
+            }
+            if (!allowedHosts.some(host => new RegExp(`^${host.replace(/\*/g, '[^/]*')}`, 'i').test(url))) {
+                throw new Error(`Host not allowed: ${url}`);
+            }
+
             try {
                 const response = await fetch(url, options);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch url ${url}`);
                 }
                 const response_type = response.headers.get('content-type');
-                if (response_type.includes('application/json')) {
-                    return response.json();
-                } else if (response_type.includes('text/html')) {
-                    return response.text();
+                if (!response_type) {
+                    throw new Error(`Response does not include a content-type header.`);
+                }
+                if (allowedResponseTypes.some(type => response_type.startsWith(type))) {
+                    if (response_type.includes('application/json')) {
+                        return {
+                            data: await response.json(),
+                            metadata: {
+                                url,
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: [...response.headers],
+                                type: response_type
+                            }
+                        };
+                    } else if (response_type.includes('text/') || response_type.includes('html')) {
+                        return {
+                            data: await response.text(),
+                            metadata: {
+                                url,
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: [...response.headers],
+                                type: response_type
+                            }
+                        };
+                    } else if (response_type.startsWith('image/') || response_type.startsWith('video/') || response_type.startsWith('audio/')) {
+                        const blob = await response.blob();
+                        const data = options.blobUrl ? URL.createObjectURL(blob) : blob;
+                        return {
+                            data,
+                            metadata: {
+                                url,
+                                status: response.status,
+                                statusText: response.statusText,
+                                headers: [...response.headers],
+                                type: response_type,
+                                size: blob.size
+                            }
+                        };
+                    }
                 } else {
                     throw new Error(`Unsupported response type: ${response_type}`);
                 }

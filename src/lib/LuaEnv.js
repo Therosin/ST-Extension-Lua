@@ -4,76 +4,9 @@
 import { createLuaBridge } from './LuaBridge';
 import Context from '../Context';
 import SetupBindings from './LuaBindings';
-
-
-/**
- * @typedef {Object} LuaFileOptions
- * @property {boolean} [module] - Whether the file should be treated as a module.
- * @property {string} [namespace] - The namespace under which the module should be registered.
- * @property {string[]} [dependencies] - An array of dependencies that must be loaded before this file.
- * @property {string} [initCode] - Additional Lua code to run before the file's main content.
-*/
-
-
-/**
- * Creates a file map based on the given array of lua files.
- * The file map is a Map object where each key represents a file path and the corresponding value is an array of dependencies.
- *
- * @param {Array<string | [string, LuaFileOptions]>} files - Array of file paths or file paths with options
- * @returns {Map<string, string[]>} - filemap.
- */
-export function createLuaFileMap(files) {
-    const fileMap = new Map();
-    files.forEach(file => {
-        let filePath, options;
-        if (Array.isArray(file)) {
-            [filePath, options] = file;
-        } else {
-            filePath = file;
-            options = {};
-        }
-        fileMap.set(filePath, options.dependencies || []);
-    });
-    return fileMap;
-}
-
-/**
- * Perform topological sort on the given map of lua files and their dependencies.
- * @param {Map<string, string[]>} fileMap - The file map
- * @returns {Array<[string, object]> | null} - Sorted array of file paths and options or null if cyclic dependency is detected
- */
-export function topologicalLuaFileSort(fileMap) {
-    const sorted = [];
-    const visited = new Set();
-    const stack = new Set();
-
-    function visit(file) {
-        if (stack.has(file)) {
-            return false; // Cycle detected
-        }
-        if (!visited.has(file)) {
-            stack.add(file);
-            const dependencies = fileMap.get(file) || [];
-            for (const dep of dependencies) {
-                if (!visit(dep)) {
-                    return false; // Cycle detected
-                }
-            }
-            stack.delete(file);
-            visited.add(file);
-            sorted.push(file);
-        }
-        return true;
-    }
-
-    for (const file of fileMap.keys()) {
-        if (!visit(file)) {
-            return null; // Cycle detected
-        }
-    }
-
-    return sorted;
-}
+import SetupWindowBindings from './LuaWindowBindings';
+import { CORE_SCRIPTS } from '../constants';
+import { createLuaFileMap, topologicalLuaFileSort } from './LuaFileLoader';
 
 /**
  * Custom LuaBridge Environment
@@ -106,6 +39,7 @@ export class LuaEnv {
     shutdown() {
         return new Promise((resolve, reject) => {
             if (this.Lua == null) reject('Lua is not initialized');
+            this.Lua.execute('if Events then Events:emit("lua::shutdown") end', {}); // Emit shutdown event to Lua
             this.Lua.close();
             this.Lua = null;
             resolve();
@@ -205,31 +139,17 @@ export class LuaEnv {
  * @param {Object} env - The Lua environment object.
  * @returns {Promise<void>} - A promise that resolves when the environment setup is complete.
 */
-const SetupEnv = async (self, env) => { // Modify the Lua State Available to ST here    
+const SetupEnv = async (self, env) => {
+
     // SillyTavern Interop, contains anything exposed by SillyTavern this makes it available to Lua.
     env.setGlobal("SillyTavern", SillyTavern);
 
-    // Create Lua bindings
+    // Set up Lua bindings
     await SetupBindings(self, env);
+    await SetupWindowBindings(self, env);
 
     // load bundled lua files
-    await self.loadFiles([
-        // Core Libraries
-        ["common/string.lua", { module: true, namespace: "Common.string" }], // String Utilities
-        ["common/table.lua", { module: true, namespace: "Common.table" }], // Table Utilities
-        ["common/localStorage.lua", { module: true, namespace: "localStorage", dependencies: ["common/table.lua"] }], // Local Storage
-        ["common/eventmanager.lua", { module: true, namespace: "EventManager" }], // Event Manager
-        ["common/LazyTimer.lua", { module: true, namespace: "LazyTimer" }], // LazyTimer
-        ["common/tool_calling.lua", { module: true, namespace: "ToolCalling", dependencies: ["libs/pandora.lua"] }], // Tool Calling
-        ["common/init.lua", { module: true, namespace: "Common" }], // Common Library
-        // Third Party Libraries.
-        ["libs/inspect.lua", { module: true, namespace: "Inspect" }], // Inspect, Human Readable Table Printing
-        ["libs/pandora.lua", { module: true, namespace: "Pandora" }], // Pandora Class Library
-        ["libs/LunaQuery.lua", { module: true, namespace: "LunaQuery" }], // LunaQuery, Linq like Query Library
-        // Main init file.
-        "init.lua",
-    ]).catch(console.error);
-
+    await self.loadFiles(CORE_SCRIPTS).catch(console.error);
 
     // register events from SillyTavern to lua
     const { eventSource, eventTypes } = SillyTavern.getContext()
