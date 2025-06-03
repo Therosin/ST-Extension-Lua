@@ -4,6 +4,7 @@
 /* global jQuery */
 import { SlashCommand } from '../../../slash-commands/SlashCommand.js';
 import { ARGUMENT_TYPE, SlashCommandNamedArgument } from '../../../slash-commands/SlashCommandArgument.js';
+import { commonEnumProviders } from '../../../slash-commands/SlashCommandCommonEnumsProvider.js';
 import { SlashCommandParser } from '../../../slash-commands/SlashCommandParser.js';
 import { executeLuaScript, executeLuaCode, Context, setup } from './dist/main.js';
 const MODULE_NAME = 'Extension-Lua';
@@ -151,6 +152,55 @@ function registerSlashCommands() {
                 description: 'If true, data will be parsed as json.',
                 typeList: [ARGUMENT_TYPE.BOOLEAN],
                 required: false,
+            }),
+        ],
+        returns: "a single return value from lua, if available."
+    }));
+
+    SlashCommandParser.addCommandObject(SlashCommand.fromProps({
+        name: 'lua-execute',
+        callback: (async ({ args, data, json }, str) => luaRunSlashCommand({ code: str, data: data, json: json }, args) ),
+        helpString: `
+        <h4>Execute raw lua code</h4>
+        <br> - Provide the lua code to run.
+        <br> - You can provide data to pass to the script, this should be string/number/boolean or you can pass a jsonstring.
+        <br> - If json is true, the data will be parsed from json string to a lua table.
+        <br> - If the script returns a value, it will be returned, if it returns a table, it will be stringified to jsonstring.
+        <br> Examples:
+        <ul>
+            <li> Example: <code>/luaex print("Hello, World!")</code> </li>
+            <li> Example: <code>/luaex return "Hello, World!" | /echo {{pipe}}</code> </li>
+        </ul>
+        <br> returned tables will be stringified, this means you can return a table from lua and pipe it directly into a variable and it just works.
+        `,
+        aliases: ["lua-ex", "lua-exe", "luaex"],
+        namedArgumentList: [
+            SlashCommandNamedArgument.fromProps({
+                name: 'args',
+                description: "Arguments to pass to the script.",
+                typeList: [ARGUMENT_TYPE.STRING],
+                required: true,
+            }),
+            SlashCommandNamedArgument.fromProps({
+                name: 'data',
+                description: `Optional data to pass to the script. must be a string, if json is true it must be a json string to parse.
+                `,
+                typeList: [ARGUMENT_TYPE.STRING],
+                required: false,
+            }),
+            SlashCommandNamedArgument.fromProps({
+                name: 'json',
+                description: 'If true, data will be parsed as json.',
+                typeList: [ARGUMENT_TYPE.BOOLEAN],
+                required: false,
+            }),
+            SlashCommandNamedArgument.fromProps({
+                name: 'raw',
+                description: 'If true, does not alter quoted literal unnamed arguments',
+                typeList: [ARGUMENT_TYPE.BOOLEAN],
+                defaultValue: 'true',
+                enumProvider: commonEnumProviders.boolean('trueFalse'),
+                isRequired: false,
             }),
         ],
         returns: "a single return value from lua, if available."
