@@ -1,19 +1,17 @@
 local Enumerable
 do
-  local _class_0
-  local defaultSelector, defaultPredicate, defaultEqualComparer, defaultResultSelector, defaultComparer, iter, iterPairs, enumerate, enumeratePairs, sortAndGroup, groupItemsByKey, valueComparerFactory, hybridSort, insertionSort, merge, load, stringLambda, getFunction
   local _base_0 = {
     aggregate = function(self, accumulator, initialValue)
-      accumulator = getFunction(accumulator)
+      accumulator = LunaQuery.getFunction(accumulator)
       local result = initialValue
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         result = accumulator(result, item)
       end
       return result
     end,
     all = function(self, predicate)
-      predicate = getFunction(predicate)
-      for item in iter(self) do
+      predicate = LunaQuery.getFunction(predicate)
+      for item in LunaQuery.iter(self) do
         if not predicate(item) then
           return false
         end
@@ -22,10 +20,10 @@ do
     end,
     any = function(self, predicate)
       if predicate == nil then
-        predicate = defaultPredicate
+        predicate = LunaQuery.defaultPredicate
       end
-      predicate = getFunction(predicate)
-      for item in iter(self) do
+      predicate = LunaQuery.getFunction(predicate)
+      for item in LunaQuery.iter(self) do
         if predicate(item) then
           return true
         end
@@ -39,11 +37,11 @@ do
     end,
     average = function(self, selector)
       if selector == nil then
-        selector = defaultSelector
+        selector = LunaQuery.defaultSelector
       end
-      selector = getFunction(selector)
+      selector = LunaQuery.getFunction(selector)
       local sum, count = 0, 0
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         sum = sum + selector(item)
         count = count + 1
       end
@@ -55,17 +53,17 @@ do
     concat = function(self, second)
       local result = self:toArray()
       local itemCount = #result
-      for i, item in iterPairs(second) do
+      for i, item in LunaQuery.iterPairs(second) do
         result[i + itemCount] = item
       end
       return self.__class(result)
     end,
     contains = function(self, value, equalComparer)
       if equalComparer == nil then
-        equalComparer = defaultEqualComparer
+        equalComparer = LunaQuery.defaultEqualComparer
       end
-      equalComparer = getFunction(equalComparer)
-      for item in iter(self) do
+      equalComparer = LunaQuery.getFunction(equalComparer)
+      for item in LunaQuery.iter(self) do
         if equalComparer(value, item) then
           return true
         end
@@ -74,11 +72,11 @@ do
     end,
     count = function(self, predicate)
       if predicate == nil then
-        predicate = defaultPredicate
+        predicate = LunaQuery.defaultPredicate
       end
-      predicate = getFunction(predicate)
+      predicate = LunaQuery.getFunction(predicate)
       local sum = 0
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         if predicate(item) then
           sum = sum + 1
         end
@@ -86,7 +84,7 @@ do
       return sum
     end,
     defaultIfEmpty = function(self, default)
-      if iter(self)() == nil then
+      if LunaQuery.iter(self)() == nil then
         return self.__class({
           default
         })
@@ -96,12 +94,12 @@ do
     end,
     distinct = function(self, equalComparer)
       if equalComparer == nil then
-        equalComparer = defaultEqualComparer
+        equalComparer = LunaQuery.defaultEqualComparer
       end
-      equalComparer = getFunction(equalComparer)
+      equalComparer = LunaQuery.getFunction(equalComparer)
       local result = { }
       local index = 1
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         local duplicate = false
         for _index_0 = 1, #result do
           local saved = result[_index_0]
@@ -117,7 +115,7 @@ do
       return self.__class(result)
     end,
     elementAt = function(self, index)
-      for i, item in iterPairs(self) do
+      for i, item in LunaQuery.iterPairs(self) do
         if i == index then
           return item
         end
@@ -125,7 +123,7 @@ do
       return assert(false, 'No element at the given index')
     end,
     elementAtOrDefault = function(self, index, default)
-      for i, item in iterPairs(self) do
+      for i, item in LunaQuery.iterPairs(self) do
         if i == index then
           return item
         end
@@ -137,11 +135,11 @@ do
     end,
     except = function(self, second, equalComparer)
       if equalComparer == nil then
-        equalComparer = defaultEqualComparer
+        equalComparer = LunaQuery.defaultEqualComparer
       end
-      equalComparer = getFunction(equalComparer)
+      equalComparer = LunaQuery.getFunction(equalComparer)
       local result, i = { }, 1
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         local _continue_0 = false
         repeat
           local duplicate = false
@@ -153,7 +151,7 @@ do
             end
           end
           if not (duplicate) then
-            for other in iter(second) do
+            for other in LunaQuery.iter(second) do
               if equalComparer(item, other) then
                 duplicate = true
                 break
@@ -176,10 +174,10 @@ do
     end,
     first = function(self, predicate)
       if predicate == nil then
-        predicate = defaultPredicate
+        predicate = LunaQuery.defaultPredicate
       end
-      predicate = getFunction(predicate)
-      for item in iter(self) do
+      predicate = LunaQuery.getFunction(predicate)
+      for item in LunaQuery.iter(self) do
         if predicate(item) then
           return item
         end
@@ -188,10 +186,10 @@ do
     end,
     firstOrDefault = function(self, default, predicate)
       if predicate == nil then
-        predicate = defaultPredicate
+        predicate = LunaQuery.defaultPredicate
       end
-      predicate = getFunction(predicate)
-      for item in iter(self) do
+      predicate = LunaQuery.getFunction(predicate)
+      for item in LunaQuery.iter(self) do
         if predicate(item) then
           return item
         end
@@ -199,8 +197,8 @@ do
       return default
     end,
     forEach = function(self, action)
-      action = getFunction(action)
-      for item in iter(self) do
+      action = LunaQuery.getFunction(action)
+      for item in LunaQuery.iter(self) do
         action(item)
       end
     end,
@@ -243,20 +241,20 @@ do
     end,
     groupBy = function(self, keySelector, valueSelector, resultSelector, equalComparer)
       if valueSelector == nil then
-        valueSelector = defaultSelector
+        valueSelector = LunaQuery.defaultSelector
       end
       if resultSelector == nil then
-        resultSelector = defaultResultSelector
+        resultSelector = LunaQuery.defaultResultSelector
       end
       if equalComparer == nil then
-        equalComparer = defaultEqualComparer
+        equalComparer = LunaQuery.defaultEqualComparer
       end
-      keySelector = getFunction(keySelector)
-      valueSelector = getFunction(valueSelector)
-      resultSelector = getFunction(resultSelector)
-      equalComparer = getFunction(equalComparer)
+      keySelector = LunaQuery.getFunction(keySelector)
+      valueSelector = LunaQuery.getFunction(valueSelector)
+      resultSelector = LunaQuery.getFunction(resultSelector)
+      equalComparer = LunaQuery.getFunction(equalComparer)
       local result = { }
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         local key = keySelector(item)
         local duplicateKey = false
         for i, existingKVs in ipairs(result) do
@@ -290,17 +288,17 @@ do
     end,
     groupJoin = function(self, inner, outerSelector, innerSelector, resultSelector, equalComparer)
       if equalComparer == nil then
-        equalComparer = defaultEqualComparer
+        equalComparer = LunaQuery.defaultEqualComparer
       end
-      outerSelector = getFunction(outerSelector)
-      innerSelector = getFunction(innerSelector)
-      resultSelector = getFunction(resultSelector)
-      equalComparer = getFunction(equalComparer)
+      outerSelector = LunaQuery.getFunction(outerSelector)
+      innerSelector = LunaQuery.getFunction(innerSelector)
+      resultSelector = LunaQuery.getFunction(resultSelector)
+      equalComparer = LunaQuery.getFunction(equalComparer)
       local keyedInner
       do
         local _accum_0 = { }
         local _len_0 = 1
-        for item in iter(inner) do
+        for item in LunaQuery.iter(inner) do
           _accum_0[_len_0] = {
             innerSelector(item),
             item
@@ -310,7 +308,7 @@ do
         keyedInner = _accum_0
       end
       local result = { }
-      for i, oItem in iterPairs(self) do
+      for i, oItem in LunaQuery.iterPairs(self) do
         local outerKey = outerSelector(oItem)
         local group, groupIndex = { }, 1
         for _index_0 = 1, #keyedInner do
@@ -327,11 +325,11 @@ do
     end,
     intersect = function(self, second, equalComparer)
       if equalComparer == nil then
-        equalComparer = defaultEqualComparer
+        equalComparer = LunaQuery.defaultEqualComparer
       end
-      equalComparer = getFunction(equalComparer)
+      equalComparer = LunaQuery.getFunction(equalComparer)
       local result = { }
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         local _continue_0 = false
         repeat
           local isUnique = true
@@ -347,7 +345,7 @@ do
             _continue_0 = true
             break
           end
-          for other in iter(second) do
+          for other in LunaQuery.iter(second) do
             if equalComparer(item, other) then
               intersects = true
               break
@@ -366,17 +364,17 @@ do
     end,
     join = function(self, inner, outerSelector, innerSelector, resultSelector, equalComparer)
       if equalComparer == nil then
-        equalComparer = defaultEqualComparer
+        equalComparer = LunaQuery.defaultEqualComparer
       end
-      outerSelector = getFunction(outerSelector)
-      innerSelector = getFunction(innerSelector)
-      resultSelector = getFunction(resultSelector)
-      equalComparer = getFunction(equalComparer)
+      outerSelector = LunaQuery.getFunction(outerSelector)
+      innerSelector = LunaQuery.getFunction(innerSelector)
+      resultSelector = LunaQuery.getFunction(resultSelector)
+      equalComparer = LunaQuery.getFunction(equalComparer)
       local keyedInner
       do
         local _accum_0 = { }
         local _len_0 = 1
-        for item in iter(inner) do
+        for item in LunaQuery.iter(inner) do
           _accum_0[_len_0] = {
             innerSelector(item),
             item
@@ -386,7 +384,7 @@ do
         keyedInner = _accum_0
       end
       local iResult, result = 1, { }
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         for _index_0 = 1, #keyedInner do
           local iKeyVal = keyedInner[_index_0]
           local ikey, iItem = iKeyVal[1], iKeyVal[2]
@@ -400,11 +398,11 @@ do
     end,
     last = function(self, predicate)
       if predicate == nil then
-        predicate = defaultPredicate
+        predicate = LunaQuery.defaultPredicate
       end
-      predicate = getFunction(predicate)
+      predicate = LunaQuery.getFunction(predicate)
       local result = nil
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         if predicate(item) then
           result = item
         end
@@ -416,11 +414,11 @@ do
     end,
     lastOrDefault = function(self, default, predicate)
       if predicate == nil then
-        predicate = defaultPredicate
+        predicate = LunaQuery.defaultPredicate
       end
-      predicate = getFunction(predicate)
+      predicate = LunaQuery.getFunction(predicate)
       local result = default
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         if predicate(item) then
           result = item
         end
@@ -429,10 +427,10 @@ do
     end,
     max = function(self, selector)
       if selector == nil then
-        selector = defaultSelector
+        selector = LunaQuery.defaultSelector
       end
-      selector = getFunction(selector)
-      local getItem = iter(self)
+      selector = LunaQuery.getFunction(selector)
+      local getItem = LunaQuery.iter(self)
       local result = selector(getItem())
       for i = 2, self.length do
         local sVal = selector(getItem())
@@ -444,10 +442,10 @@ do
     end,
     min = function(self, selector)
       if selector == nil then
-        selector = defaultSelector
+        selector = LunaQuery.defaultSelector
       end
-      selector = getFunction(selector)
-      local getItem = iter(self)
+      selector = LunaQuery.getFunction(selector)
+      local getItem = LunaQuery.iter(self)
       local result = selector(getItem())
       for i = 2, self.length do
         local sVal = selector(getItem())
@@ -461,7 +459,7 @@ do
       return self.__class((function()
         local _accum_0 = { }
         local _len_0 = 1
-        for item in iter(self) do
+        for item in LunaQuery.iter(self) do
           if type(item) == whichType then
             _accum_0[_len_0] = item
             _len_0 = _len_0 + 1
@@ -472,17 +470,17 @@ do
     end,
     orderBy = function(self, keySelector, comparer)
       if keySelector == nil then
-        keySelector = defaultSelector
+        keySelector = LunaQuery.defaultSelector
       end
       if comparer == nil then
-        comparer = defaultComparer
+        comparer = LunaQuery.defaultComparer
       end
-      keySelector = getFunction(keySelector)
-      comparer = getFunction(comparer)
-      return self.__class(sortAndGroup((function()
+      keySelector = LunaQuery.getFunction(keySelector)
+      comparer = LunaQuery.getFunction(comparer)
+      return self.__class(LunaQuery.sortAndGroup((function()
         local _accum_0 = { }
         local _len_0 = 1
-        for item in iter(self) do
+        for item in LunaQuery.iter(self) do
           _accum_0[_len_0] = item
           _len_0 = _len_0 + 1
         end
@@ -491,17 +489,17 @@ do
     end,
     orderByDescending = function(self, keySelector, comparer)
       if keySelector == nil then
-        keySelector = defaultSelector
+        keySelector = LunaQuery.defaultSelector
       end
       if comparer == nil then
-        comparer = defaultComparer
+        comparer = LunaQuery.defaultComparer
       end
-      keySelector = getFunction(keySelector)
-      comparer = getFunction(comparer)
-      return self.__class(sortAndGroup((function()
+      keySelector = LunaQuery.getFunction(keySelector)
+      comparer = LunaQuery.getFunction(comparer)
+      return self.__class(LunaQuery.sortAndGroup((function()
         local _accum_0 = { }
         local _len_0 = 1
-        for item in iter(self) do
+        for item in LunaQuery.iter(self) do
           _accum_0[_len_0] = item
           _len_0 = _len_0 + 1
         end
@@ -512,7 +510,7 @@ do
       local result = {
         element
       }
-      for i, item in iterPairs(self) do
+      for i, item in LunaQuery.iterPairs(self) do
         result[i + 1] = item
       end
       return self.__class(result)
@@ -541,17 +539,17 @@ do
     end,
     reverse = function(self)
       local result, r = { }, self.length + 1
-      for i, item in iterPairs(self) do
+      for i, item in LunaQuery.iterPairs(self) do
         result[r - i] = item
       end
       return self.__class(result)
     end,
     select = function(self, selector)
-      selector = getFunction(selector)
+      selector = LunaQuery.getFunction(selector)
       return self.__class((function()
         local _accum_0 = { }
         local _len_0 = 1
-        for i, item in iterPairs(self) do
+        for i, item in LunaQuery.iterPairs(self) do
           _accum_0[_len_0] = selector(item, i)
           _len_0 = _len_0 + 1
         end
@@ -560,12 +558,12 @@ do
     end,
     selectMany = function(self, collectionSelector, resultSelector)
       if resultSelector == nil then
-        resultSelector = defaultSelector
+        resultSelector = LunaQuery.defaultSelector
       end
-      collectionSelector = getFunction(collectionSelector or defaultSelector)
-      resultSelector = getFunction(resultSelector)
+      collectionSelector = LunaQuery.getFunction(collectionSelector or LunaQuery.defaultSelector)
+      resultSelector = LunaQuery.getFunction(resultSelector)
       local result = { }
-      for i, item in iterPairs(self) do
+      for i, item in LunaQuery.iterPairs(self) do
         local start = #result
         local sequence = collectionSelector(item, i)
         for iSeq, item in ipairs(sequence) do
@@ -576,13 +574,13 @@ do
     end,
     sequenceEqual = function(self, second, equalComparer)
       if equalComparer == nil then
-        equalComparer = defaultEqualComparer
+        equalComparer = LunaQuery.defaultEqualComparer
       end
       if not (self.length == second.length) then
         return false
       end
-      equalComparer = getFunction(equalComparer)
-      local getItem1, getItem2 = iter(self), iter(second)
+      equalComparer = LunaQuery.getFunction(equalComparer)
+      local getItem1, getItem2 = LunaQuery.iter(self), LunaQuery.iter(second)
       for i = 1, self.length do
         if not (equalComparer(getItem1(), getItem2())) then
           return false
@@ -592,14 +590,14 @@ do
     end,
     single = function(self, predicate)
       if predicate == nil then
-        predicate = defaultPredicate
+        predicate = LunaQuery.defaultPredicate
       end
-      predicate = getFunction(predicate)
+      predicate = LunaQuery.getFunction(predicate)
       local result
       do
         local _accum_0 = { }
         local _len_0 = 1
-        for item in iter(self) do
+        for item in LunaQuery.iter(self) do
           if predicate(item) then
             _accum_0[_len_0] = item
             _len_0 = _len_0 + 1
@@ -613,14 +611,14 @@ do
     end,
     singleOrDefault = function(self, default, predicate)
       if predicate == nil then
-        predicate = defaultPredicate
+        predicate = LunaQuery.defaultPredicate
       end
-      predicate = getFunction(predicate)
+      predicate = LunaQuery.getFunction(predicate)
       local result
       do
         local _accum_0 = { }
         local _len_0 = 1
-        for item in iter(self) do
+        for item in LunaQuery.iter(self) do
           if predicate(item) then
             _accum_0[_len_0] = item
             _len_0 = _len_0 + 1
@@ -638,7 +636,7 @@ do
       return self.__class((function()
         local _accum_0 = { }
         local _len_0 = 1
-        for i, item in iterPairs(self) do
+        for i, item in LunaQuery.iterPairs(self) do
           if i > count then
             _accum_0[_len_0] = item
             _len_0 = _len_0 + 1
@@ -648,15 +646,15 @@ do
       end)())
     end,
     skipLast = function(self, count)
-      local result, getItem = { }, iter(self)
+      local result, getItem = { }, LunaQuery.iter(self)
       for i = 1, self.length - count do
         result[i] = getItem()
       end
       return self.__class(result)
     end,
     skipWhile = function(self, predicate)
-      predicate = getFunction(predicate)
-      local result, getItem = { }, iter(self)
+      predicate = LunaQuery.getFunction(predicate)
+      local result, getItem = { }, LunaQuery.iter(self)
       for i = 1, self.length do
         local item = getItem()
         if not (predicate(item)) then
@@ -671,18 +669,18 @@ do
     end,
     sum = function(self, selector)
       if selector == nil then
-        selector = defaultSelector
+        selector = LunaQuery.defaultSelector
       end
-      selector = getFunction(selector)
+      selector = LunaQuery.getFunction(selector)
       local sum = 0
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         sum = sum + selector(item)
       end
       return sum
     end,
     take = function(self, count)
       local result = { }
-      for i, item in iterPairs(self) do
+      for i, item in LunaQuery.iterPairs(self) do
         if i > count then
           break
         else
@@ -695,7 +693,7 @@ do
       return self.__class((function()
         local _accum_0 = { }
         local _len_0 = 1
-        for i, item in iterPairs(self) do
+        for i, item in LunaQuery.iterPairs(self) do
           if i > self.length - count then
             _accum_0[_len_0] = item
             _len_0 = _len_0 + 1
@@ -705,9 +703,9 @@ do
       end)())
     end,
     takeWhile = function(self, predicate)
-      predicate = getFunction(predicate)
+      predicate = LunaQuery.getFunction(predicate)
       local result = { }
-      for i, item in iterPairs(self) do
+      for i, item in LunaQuery.iterPairs(self) do
         if predicate(item) then
           result[i] = item
         else
@@ -718,32 +716,32 @@ do
     end,
     thenBy = function(self, keySelector, comparer)
       if keySelector == nil then
-        keySelector = defaultSelector
+        keySelector = LunaQuery.defaultSelector
       end
       if comparer == nil then
-        comparer = defaultComparer
+        comparer = LunaQuery.defaultComparer
       end
-      keySelector = getFunction(keySelector)
-      comparer = getFunction(comparer)
+      keySelector = LunaQuery.getFunction(keySelector)
+      comparer = LunaQuery.getFunction(comparer)
       assert(self.orderedBy > 0, 'not implemented')
-      return self.__class(sortAndGroup(self.items, self.orderedBy, keySelector, comparer), self.length, self.orderedBy + 1)
+      return self.__class(LunaQuery.sortAndGroup(self.items, self.orderedBy, keySelector, comparer), self.length, self.orderedBy + 1)
     end,
     thenByDescending = function(self, keySelector, comparer)
       if keySelector == nil then
-        keySelector = defaultSelector
+        keySelector = LunaQuery.defaultSelector
       end
       if comparer == nil then
-        comparer = defaultComparer
+        comparer = LunaQuery.defaultComparer
       end
-      keySelector = getFunction(keySelector)
-      comparer = getFunction(comparer)
+      keySelector = LunaQuery.getFunction(keySelector)
+      comparer = LunaQuery.getFunction(comparer)
       assert(self.orderedBy > 0, 'not implemented')
-      return self.__class(sortAndGroup(self.items, self.orderedBy, keySelector, comparer, true), self.length, self.orderedBy + 1)
+      return self.__class(LunaQuery.sortAndGroup(self.items, self.orderedBy, keySelector, comparer, true), self.length, self.orderedBy + 1)
     end,
     toArray = function(self)
       local _accum_0 = { }
       local _len_0 = 1
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         _accum_0[_len_0] = item
         _len_0 = _len_0 + 1
       end
@@ -751,12 +749,12 @@ do
     end,
     toDictionary = function(self, keySelector, valueSelector)
       if valueSelector == nil then
-        valueSelector = defaultSelector
+        valueSelector = LunaQuery.defaultSelector
       end
-      keySelector = getFunction(keySelector)
-      valueSelector = getFunction(valueSelector)
+      keySelector = LunaQuery.getFunction(keySelector)
+      valueSelector = LunaQuery.getFunction(valueSelector)
       local result = { }
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         local k = keySelector(item)
         assert(result[k] == nil, 'invalid or duplicate key')
         result[k] = valueSelector(item)
@@ -767,7 +765,7 @@ do
       return self.__class((function()
         local _accum_0 = { }
         local _len_0 = 1
-        for item in iter(self) do
+        for item in LunaQuery.iter(self) do
           _accum_0[_len_0] = item
           _len_0 = _len_0 + 1
         end
@@ -776,7 +774,7 @@ do
     end,
     toHashSet = function(self)
       local result = { }
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         assert(not result[item], 'duplicate key')
         result[item] = true
       end
@@ -787,12 +785,12 @@ do
     end,
     toLookup = function(self, keySelector, valueSelector)
       if valueSelector == nil then
-        valueSelector = defaultSelector
+        valueSelector = LunaQuery.defaultSelector
       end
-      keySelector = getFunction(keySelector)
-      valueSelector = getFunction(valueSelector)
+      keySelector = LunaQuery.getFunction(keySelector)
+      valueSelector = LunaQuery.getFunction(valueSelector)
       local result = { }
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         local k = keySelector(item)
         if result[k] == nil then
           result[k] = { }
@@ -803,12 +801,12 @@ do
     end,
     union = function(self, second, equalComparer)
       if equalComparer == nil then
-        equalComparer = defaultEqualComparer
+        equalComparer = LunaQuery.defaultEqualComparer
       end
-      equalComparer = getFunction(equalComparer)
+      equalComparer = LunaQuery.getFunction(equalComparer)
       local result = { }
       local index = 1
-      for item in iter(self) do
+      for item in LunaQuery.iter(self) do
         local duplicate = false
         for _index_0 = 1, #result do
           local saved = result[_index_0]
@@ -822,7 +820,7 @@ do
           index = index + 1
         end
       end
-      for item in iter(second) do
+      for item in LunaQuery.iter(second) do
         local duplicate = false
         for _index_0 = 1, #result do
           local saved = result[_index_0]
@@ -839,11 +837,11 @@ do
       return self.__class(result)
     end,
     where = function(self, predicate)
-      predicate = getFunction(predicate)
+      predicate = LunaQuery.getFunction(predicate)
       return self.__class((function()
         local _accum_0 = { }
         local _len_0 = 1
-        for item in iter(self) do
+        for item in LunaQuery.iter(self) do
           if predicate(item) then
             _accum_0[_len_0] = item
             _len_0 = _len_0 + 1
@@ -854,14 +852,14 @@ do
     end,
     zip = function(self, second, resultSelector)
       if resultSelector == nil then
-        resultSelector = defaultResultSelector
+        resultSelector = LunaQuery.defaultResultSelector
       end
-      resultSelector = getFunction(resultSelector)
+      resultSelector = LunaQuery.getFunction(resultSelector)
       local length = math.min(self.length, second.length)
       if length == 0 then
         return { }
       end
-      local result, getItem1, getItem2 = { }, iter(self), iter(second)
+      local result, getItem1, getItem2 = { }, LunaQuery.iter(self), LunaQuery.iter(second)
       for i = 1, length do
         result[i] = resultSelector(getItem1(), getItem2())
       end
@@ -869,7 +867,7 @@ do
     end
   }
   _base_0.__index = _base_0
-  _class_0 = setmetatable({
+  local _class_0 = setmetatable({
     __init = function(self, collection, count, orderedBy)
       self.items = collection
       self.length = count or #collection
@@ -880,29 +878,33 @@ do
   }, {
     __index = _base_0,
     __call = function(cls, ...)
-      local _self_0 = setmetatable({}, _base_0)
+      local _self_0 = setmetatable({ }, _base_0)
       cls.__init(_self_0, ...)
       return _self_0
     end
   })
   _base_0.__class = _class_0
-  local self = _class_0
-  defaultSelector = function(a)
+  Enumerable = _class_0
+end
+-- Add LunaQuery function table to global
+if type(_G.LunaQuery) ~= 'table' or (_G.LunaQuery and _G.LunaQuery.getFunction == nil) then
+  local LunaQuery = { }
+  LunaQuery.defaultSelector = function(a)
     return a
   end
-  defaultPredicate = function(a)
+  LunaQuery.defaultPredicate = function(a)
     return true
   end
-  defaultEqualComparer = function(a, b)
+  LunaQuery.defaultEqualComparer = function(a, b)
     return a == b
   end
-  defaultResultSelector = function(a, b)
+  LunaQuery.defaultResultSelector = function(a, b)
     return {
       a,
       b
     }
   end
-  defaultComparer = function(a, b)
+  LunaQuery.defaultComparer = function(a, b)
     if a > b then
       return 1
     else
@@ -913,13 +915,13 @@ do
       end
     end
   end
-  iter = function(self)
-    return enumerate(self.items, self.orderedBy)
+  LunaQuery.iter = function(self)
+    return LunaQuery.enumerate(self.items, self.orderedBy)
   end
-  iterPairs = function(self)
-    return enumeratePairs(self.items, self.orderedBy)
+  LunaQuery.iterPairs = function(self)
+    return LunaQuery.enumeratePairs(self.items, self.orderedBy)
   end
-  enumerate = function(t, depth)
+  LunaQuery.enumerate = function(t, depth)
     if depth == 0 then
       local i = 0
       return function()
@@ -929,7 +931,7 @@ do
     else
       local d = depth - 1
       local i = 1
-      local myIter = enumerate(t[i], d)
+      local myIter = LunaQuery.enumerate(t[i], d)
       return function()
         local nextval = myIter()
         if not (nextval == nil) then
@@ -939,14 +941,14 @@ do
         if t[i] == nil then
           return nil
         end
-        myIter = enumerate(t[i], d)
+        myIter = LunaQuery.enumerate(t[i], d)
         return myIter()
       end
     end
   end
-  enumeratePairs = function(t, depth)
+  LunaQuery.enumeratePairs = function(t, depth)
     local i = 0
-    local getItem = enumerate(t, depth)
+    local getItem = LunaQuery.enumerate(t, depth)
     return function()
       i = i + 1
       local item = getItem()
@@ -956,12 +958,12 @@ do
       return i, item
     end
   end
-  sortAndGroup = function(t, depth, keySelector, comparer, descending)
+  LunaQuery.sortAndGroup = function(t, depth, keySelector, comparer, descending)
     if depth > 0 then
       local _accum_0 = { }
       local _len_0 = 1
       for i = 1, #t do
-        _accum_0[_len_0] = sortAndGroup(t[i], depth - 1, keySelector, comparer, descending)
+        _accum_0[_len_0] = LunaQuery.sortAndGroup(t[i], depth - 1, keySelector, comparer, descending)
         _len_0 = _len_0 + 1
       end
       return _accum_0
@@ -980,10 +982,10 @@ do
       end
       itemKeyPairs = _accum_0
     end
-    local sortedIKPs = hybridSort(itemKeyPairs, valueComparerFactory(comparer, descending))
-    return groupItemsByKey(sortedIKPs, comparer)
+    local sortedIKPs = LunaQuery.hybridSort(itemKeyPairs, LunaQuery.valueComparerFactory(comparer, descending))
+    return LunaQuery.groupItemsByKey(sortedIKPs, comparer)
   end
-  groupItemsByKey = function(sortedItemPairs, comparer)
+  LunaQuery.groupItemsByKey = function(sortedItemPairs, comparer)
     local result, r = {
       {
         sortedItemPairs[1][1]
@@ -1001,7 +1003,7 @@ do
     end
     return result
   end
-  valueComparerFactory = function(comparer, descending)
+  LunaQuery.valueComparerFactory = function(comparer, descending)
     return function(a, b)
       local valueA, valueB = a[2], b[2]
       if descending then
@@ -1011,15 +1013,15 @@ do
       end
     end
   end
-  hybridSort = function(list, comparer)
+  LunaQuery.hybridSort = function(list, comparer)
     if not (#list > 1) then
       return list
     end
     if not (#list > 15) then
-      return insertionSort(list, comparer)
+      return LunaQuery.insertionSort(list, comparer)
     end
     local midPt = math.floor(#list / 2)
-    local left = hybridSort((function()
+    local left = LunaQuery.hybridSort((function()
       local _accum_0 = { }
       local _len_0 = 1
       local _max_0 = midPt
@@ -1030,7 +1032,7 @@ do
       end
       return _accum_0
     end)(), comparer)
-    local right = hybridSort((function()
+    local right = LunaQuery.hybridSort((function()
       local _accum_0 = { }
       local _len_0 = 1
       for _index_0 = midPt + 1, #list do
@@ -1043,7 +1045,7 @@ do
     if comparer(left[#left], right[1]) > 0 then
       local _accum_0 = { }
       local _len_0 = 1
-      for item in merge(left, right, comparer) do
+      for item in LunaQuery.merge(left, right, comparer) do
         _accum_0[_len_0] = item
         _len_0 = _len_0 + 1
       end
@@ -1055,7 +1057,7 @@ do
     end
     return left
   end
-  insertionSort = function(list, comparer)
+  LunaQuery.insertionSort = function(list, comparer)
     for i = 2, #list do
       local w = list[i]
       local j = i - 1
@@ -1067,7 +1069,7 @@ do
     end
     return list
   end
-  merge = function(left, right, comparer)
+  LunaQuery.merge = function(left, right, comparer)
     local l, r = 1, 1
     return function()
       if right[r] == nil or left[l] ~= nil and comparer(left[l], right[r]) < 1 then
@@ -1079,22 +1081,22 @@ do
       end
     end
   end
-  load = _G.loadstring or _G.load
-  stringLambda = function(str)
+  LunaQuery.load = _G.loadstring or _G.load
+  LunaQuery.stringLambda = function(str)
     local arrowStart = assert(string.find(str, '->'), 'Invalid string lambda: "' .. str .. '"')
     local argStr = string.sub(str, 1, arrowStart - 1)
     argStr = string.gsub(string.gsub(argStr, '%(', ''), '%)', '')
     local exprStr = string.sub(str, arrowStart + 2)
-    return assert(load('return function(' .. argStr .. ') return ' .. exprStr .. ' end')())
+    return assert(LunaQuery.load('return function(' .. argStr .. ') return ' .. exprStr .. ' end')())
   end
-  getFunction = function(expression)
+  LunaQuery.getFunction = function(expression)
     local predType = type(expression)
     if predType == 'function' then
       return expression
     end
     assert(predType == 'string', 'Invalid predicate type: [' .. predType .. ']')
-    return stringLambda(expression)
+    return LunaQuery.stringLambda(expression)
   end
-  Enumerable = _class_0
+  _G.LunaQuery = LunaQuery
 end
 return Enumerable
