@@ -30,48 +30,96 @@
   margin-top: 5px;
 }
 
-/* Container for Lua scripts */
-.extension-lua-scripts-container {
+/* Global Scripts container (list + editor) */
+.globalscripts-container {
   width: 100%;
-  height: calc(80dvh - 2rem) !important; /* Limit the height of the container */
+  height: calc(80dvh - 2rem);
   display: flex;
   gap: 10px;
 }
 
-/* Header for Lua scripts */
-.extension-lua-scripts-header {
+/* Header for Global Scripts */
+.globalscripts-header {
   border-bottom: 1px solid #e0e0e0;
   padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* List of Lua scripts */
-.extension-lua-scripts-list {
-  flex: 1; /* Take up remaining space */
-  max-width: 250px; /* Prevent the list from growing too wide */
-  max-height: calc(80dvh - 2rem) !important; /* Limit the height of the list */
+/* Add Script button (styled!) */
+.globalscripts-header button {
+  background: #22cc77;
+  color: #232323;
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-weight: 600;
+  border: none;
+  margin-left: 12px;
+  transition: background 0.18s;
+  box-shadow: 0 2px 8px #0002;
+  cursor: pointer;
+}
+.globalscripts-header button:hover,
+.globalscripts-header button:focus {
+  background: #33dd88;
+  outline: none;
+}
+
+/* List of Global Scripts */
+.globalscripts-list {
+  min-width: 140px;
+  max-width: 250px;
+  max-height: calc(80dvh - 2rem);
   padding: 10px;
   background-color: #2a2a2a;
-  border-right: 1px solid #444; /* Separate visually from the editor */
-  overflow: auto !important; /* Ensure the list is scrollable */
+  border-right: 1px solid #444;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #444 #232323;
+}
+.globalscripts-list::-webkit-scrollbar {
+  width: 8px;
+  background: #232323;
+}
+.globalscripts-list::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
 }
 
-/* Container for individual Lua script */
-.extension-lua-scripts-list-script-container {
+/* Script list item container */
+.globalscripts-list-script-container {
   margin-bottom: 20px;
+  border-radius: 4px;
+  padding: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.globalscripts-list-script-container:hover {
+  background: #363636;
+}
+.globalscripts-list-script-container.selected-script {
+  background: #252c36;
+  border-left: 4px solid #22cc77;
+  box-shadow: 0 1px 6px #0003;
+}
+.globalscripts-list-script-container.selected-script .globalscripts-list-script-nameInput {
+  font-weight: bold;
+  color: #fff;
 }
 
-/* Header for individual Lua script */
-.extension-lua-scripts-list-script-header {
-  padding: 10px 20px;
-  border-bottom: 1px solid #e0e0e0;
+/* Header for each script in the list */
+.globalscripts-list-script-header {
+  padding: 10px 0 0 0;
+  border-bottom: none;
   justify-content: space-between;
   align-items: flex-start;
   display: flex;
 }
 
 /* Input for script name */
-.extension-lua-scripts-list-script-nameInput {
-  width: 100%; /* Use full width of its container */
+.globalscripts-list-script-nameInput {
+  width: 100%;
   padding: 8px;
   margin-top: 5px;
   margin-bottom: 10px;
@@ -80,27 +128,90 @@
   background-color: #1e1e1e;
   color: #fff;
   font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border 0.2s;
+}
+.globalscripts-list-script-nameInput:focus {
+  border-color: #22cc77;
+  outline: none;
 }
 
-/* Code input area */
-.extension-lua-scripts-list-script-codeInput {
-  flex: 1; /* Take up remaining space */
+/* Code input area (for fallback/legacy plain textarea) */
+.globalscripts-list-script-codeInput {
+  flex: 1;
   padding: 10px;
   border: 1px solid #444;
   border-radius: 4px;
   background-color: #1e1e1e;
   color: #fff;
   font-size: 14px;
-  font-family: monospace;
+  font-family: inherit;
   min-height: 200px;
+  resize: vertical;
 }
 
-/* Code editor container */
-.extension-lua-scripts-code-editor {
-  flex: 1; /* Take up remaining space */
+.globalscripts-code-editor {
+  flex: 1 1 0%;
   display: flex;
   flex-direction: column;
+  min-height: 0;           /* CRITICAL for flexbox fill */
   padding: 10px;
   overflow: auto;
+  background: #1e1e1e;
+  border-radius: 4px;
+}
+
+/* The direct child div wrapping CodeMirror (for fill) */
+.globalscripts-code-editor > div {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;           /* CRITICAL for flexbox fill */
+  max-height: 100%;
+}
+
+.globalscripts-code-editor::-webkit-scrollbar {
+  width: 8px;
+  background: #232323;
+}
+.globalscripts-code-editor::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
+/* Defensive CodeMirror text alignment + font */
+.globalscripts-code-editor .cm-editor,
+.globalscripts-code-editor .cm-content {
+  text-align: left !important;
+  font-family: inherit !important;
+  color: #eee !important;
+  background: #1e1e1e !important;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  height: 100% !important;      /* Fill parent height */
+}
+
+/* Make CodeMirror itself fill its container */
+.cm-editor {
+  flex: 1 1 0%;
+  height: 100% !important;      /* Fill parent height */
   min-height: 200px;
+  max-height: 100%;
+  background: #1e1e1e;
+  border-radius: 6px;
+  border: 1px solid #333;
+  box-sizing: border-box;
+}
+
+/* Responsive: Stack on mobile */
+@media (max-width: 700px) {
+  .globalscripts-container {
+    flex-direction: column;
+  }
+  .globalscripts-list,
+  .globalscripts-code-editor {
+    max-width: 100%;
+    min-width: 0;
+  }
 }
