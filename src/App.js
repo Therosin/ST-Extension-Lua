@@ -46,6 +46,7 @@ function App() {
     function handleClick() {
         const context = SillyTavern.getContext();
         const element = document.createElement('div');
+        element.classList.add('extension-lua-edit-scripts-popup');
         const debouncedListChangeHandler = _.debounce(handleListChange, 500);
         ReactDOM.render(<EditScriptsPopup onListChange={debouncedListChangeHandler} initialList={Context.getGlobalScripts()} />, element);
         context.callGenericPopup(element, 4, 'Global Scripts', {

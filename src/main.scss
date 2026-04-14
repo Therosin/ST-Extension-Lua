@@ -72,7 +72,7 @@
   max-width: 250px;
   max-height: calc(80dvh - 2rem);
   padding: 10px;
-  background-color: #2a2a2a;
+  background-color: #1e1e1e;
   border-right: 1px solid #444;
   overflow: auto;
   scrollbar-width: thin;
@@ -169,6 +169,11 @@
   flex-direction: column;
   min-height: 0;           /* CRITICAL for flexbox fill */
   max-height: 100%;
+}
+
+.popup:has(.extension-lua-edit-scripts-popup) {
+  width: 90dvw;
+  max-width: 1200px;
 }
 
 .globalscripts-code-editor::-webkit-scrollbar {
