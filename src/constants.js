@@ -27,10 +27,10 @@ export const DEFAULT_SETTINGS = {
  * - namespace: string - The namespace under which the module should be registered. (required if module is true, literal string that will be used to require the module in Lua)
  * - dependencies: string[] - An array of dependencies that must be loaded before this file.
  * - initCode: string - Additional Lua code to run before the file's main content (Optional, not recommended though can be used to set up global variables or functions).
- * 
+ *
  * The order of the scripts in this array is important as the scripts will be loaded in the order they appear, though due to timing issues, dependencies may not be loaded in the order they appear.
  * To avoid dependency issues, it is recommended to use the dependencies property to specify dependents so we can sort them properly later.
- * 
+ *
  * @type {Array<[string, import('./lib/LuaFileLoader').LuaFileOptions]>}
  *
 */
@@ -49,7 +49,7 @@ export const CORE_SCRIPTS = [
     ["libs/pandora.lua", { module: true, namespace: "Pandora" }], // Pandora Class Library
     ["libs/LunaQuery.lua", { module: true, namespace: "LunaQuery" }], // LunaQuery, Linq like Query Library
     // Main init file.
-    ["init.lua", { dependencies: ["common/init.lua", "libs/inspect.lua"] }],
+    ["init.lua", { dependencies: ["common/init.lua", "libs/inspect.lua", "common/logging.lua"] }],
 ];
 
 /**
